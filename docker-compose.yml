@@ -7,5 +7,10 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=production
+    # Map container user to host user for proper permissions
+    user: "1001:1001"
     volumes:
-      - ./data:/app/data # Mounts entire data directory (metadata.json + tutorials/*.html)
+      # Use bind mount with proper permissions
+      - ./data:/app/data
+    # Ensure data directory exists on host before starting
+    command: sh -c "chmod -R 755 /app/data 2>/dev/null || true && node server.js"

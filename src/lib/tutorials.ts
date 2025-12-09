@@ -90,30 +90,57 @@ export function getTutorial(id: string): Tutorial | undefined {
 }
 
 export function saveTutorial(tutorial: Tutorial): void {
-    ensureDirectories();
+    try {
+        ensureDirectories();
 
-    const metadata = getMetadata();
+        const metadata = getMetadata();
 
-    // Save HTML content to separate file
-    const filePath = getTutorialFilePath(tutorial.id);
-    fs.writeFileSync(filePath, tutorial.content, 'utf8');
+        // Save HTML content to separate file
+        const filePath = getTutorialFilePath(tutorial.id);
 
-    // Get file size
-    const stats = fs.statSync(filePath);
+        console.log(`[saveTutorial] Attempting to save tutorial to: ${filePath}`);
 
-    // Save metadata
-    const meta: TutorialMetadata = {
-        id: tutorial.id,
-        title: tutorial.title,
-        description: tutorial.description,
-        category: tutorial.category,
-        tags: tutorial.tags,
-        createdAt: tutorial.createdAt,
-        fileSize: stats.size
-    };
+        try {
+            fs.writeFileSync(filePath, tutorial.content, 'utf8');
+            console.log(`[saveTutorial] Successfully wrote HTML file: ${filePath}`);
+        } catch (writeError: any) {
+            console.error(`[saveTutorial] Failed to write HTML file: ${filePath}`, writeError);
+            throw new Error(`Failed to write tutorial file: ${writeError.message}. Check Docker volume permissions.`);
+        }
 
-    metadata.push(meta);
-    saveMetadata(metadata);
+        // Get file size
+        const stats = fs.statSync(filePath);
+
+        // Save metadata
+        const meta: TutorialMetadata = {
+            id: tutorial.id,
+            title: tutorial.title,
+            description: tutorial.description,
+            category: tutorial.category,
+            tags: tutorial.tags,
+            createdAt: tutorial.createdAt,
+            fileSize: stats.size
+        };
+
+        metadata.push(meta);
+
+        try {
+            saveMetadata(metadata);
+            console.log(`[saveTutorial] Successfully saved metadata for: ${tutorial.id}`);
+        } catch (metaError: any) {
+            console.error(`[saveTutorial] Failed to save metadata`, metaError);
+            // Try to clean up the HTML file if metadata save fails
+            try {
+                fs.unlinkSync(filePath);
+            } catch (cleanupError) {
+                console.error(`[saveTutorial] Failed to cleanup HTML file after metadata error`, cleanupError);
+            }
+            throw new Error(`Failed to save tutorial metadata: ${metaError.message}. Check Docker volume permissions.`);
+        }
+    } catch (error: any) {
+        console.error(`[saveTutorial] Error saving tutorial:`, error);
+        throw error;
+    }
 }
 
 export function deleteTutorial(id: string): void {
@@ -129,29 +156,51 @@ export function deleteTutorial(id: string): void {
 }
 
 export function updateTutorial(updatedTutorial: Tutorial): void {
-    let metadata = getMetadata();
-    const index = metadata.findIndex(t => t.id === updatedTutorial.id);
+    try {
+        let metadata = getMetadata();
+        const index = metadata.findIndex(t => t.id === updatedTutorial.id);
 
-    if (index !== -1) {
-        // Update HTML file
-        const filePath = getTutorialFilePath(updatedTutorial.id);
-        fs.writeFileSync(filePath, updatedTutorial.content, 'utf8');
+        if (index !== -1) {
+            // Update HTML file
+            const filePath = getTutorialFilePath(updatedTutorial.id);
 
-        // Get new file size
-        const stats = fs.statSync(filePath);
+            console.log(`[updateTutorial] Attempting to update tutorial: ${filePath}`);
 
-        // Update metadata
-        metadata[index] = {
-            id: updatedTutorial.id,
-            title: updatedTutorial.title,
-            description: updatedTutorial.description,
-            category: updatedTutorial.category,
-            tags: updatedTutorial.tags,
-            createdAt: updatedTutorial.createdAt,
-            fileSize: stats.size
-        };
+            try {
+                fs.writeFileSync(filePath, updatedTutorial.content, 'utf8');
+                console.log(`[updateTutorial] Successfully updated HTML file: ${filePath}`);
+            } catch (writeError: any) {
+                console.error(`[updateTutorial] Failed to write HTML file: ${filePath}`, writeError);
+                throw new Error(`Failed to update tutorial file: ${writeError.message}. Check Docker volume permissions.`);
+            }
 
-        saveMetadata(metadata);
+            // Get new file size
+            const stats = fs.statSync(filePath);
+
+            // Update metadata
+            metadata[index] = {
+                id: updatedTutorial.id,
+                title: updatedTutorial.title,
+                description: updatedTutorial.description,
+                category: updatedTutorial.category,
+                tags: updatedTutorial.tags,
+                createdAt: updatedTutorial.createdAt,
+                fileSize: stats.size
+            };
+
+            try {
+                saveMetadata(metadata);
+                console.log(`[updateTutorial] Successfully updated metadata for: ${updatedTutorial.id}`);
+            } catch (metaError: any) {
+                console.error(`[updateTutorial] Failed to save metadata`, metaError);
+                throw new Error(`Failed to update tutorial metadata: ${metaError.message}. Check Docker volume permissions.`);
+            }
+        } else {
+            throw new Error(`Tutorial with id ${updatedTutorial.id} not found`);
+        }
+    } catch (error: any) {
+        console.error(`[updateTutorial] Error updating tutorial:`, error);
+        throw error;
     }
 }
 

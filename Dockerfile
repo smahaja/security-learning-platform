@@ -41,6 +41,11 @@ COPY --from=builder /app/public ./public
 RUN mkdir .next
 RUN chown nextjs:nodejs .next
 
+# Create data directory with proper permissions BEFORE copying
+# This ensures the nextjs user owns the directory structure
+RUN mkdir -p data/tutorials
+RUN chown -R nextjs:nodejs data
+
 # Automatically leverage output traces to reduce image size
 # https://nextjs.org/docs/advanced-features/output-file-tracing
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
