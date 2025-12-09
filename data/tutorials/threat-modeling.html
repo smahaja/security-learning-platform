@@ -1,0 +1,2408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Threat Modeling & Security QA - Industry Projects</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 30px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+            animation: slide 3s linear infinite;
+        }
+        
+        @keyframes slide {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        h1 {
+            font-size: 3rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+        
+        .subtitle {
+            color: #64748b;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+        }
+        
+        .methodology-selector {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .method-tabs {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .method-tab {
+            padding: 14px 28px;
+            background: #f3f4f6;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .method-tab:hover {
+            background: #e5e7eb;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .method-tab.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .method-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ef4444;
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+        
+        .content-section {
+            display: none;
+        }
+        
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card h2 {
+            color: #1e293b;
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card h3 {
+            color: #334155;
+            font-size: 1.6rem;
+            margin: 25px 0 15px 0;
+        }
+        
+        .threat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .threat-card {
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            border-radius: 15px;
+            padding: 20px;
+            border-left: 5px solid #667eea;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .threat-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .threat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .threat-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        
+        .threat-severity {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .severity-critical {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+        
+        .severity-high {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+        }
+        
+        .severity-medium {
+            background: linear-gradient(135deg, #eab308, #ca8a04);
+        }
+        
+        .severity-low {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+        }
+        
+        .threat-description {
+            color: #64748b;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        
+        .threat-metrics {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .metric-badge {
+            background: white;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .stride-matrix {
+            background: #f8fafc;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+        
+        .stride-category {
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .stride-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .stride-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .stride-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        
+        .threat-list {
+            list-style: none;
+            margin: 15px 0;
+        }
+        
+        .threat-item {
+            padding: 12px;
+            background: #f1f5f9;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .threat-item:hover {
+            background: #e2e8f0;
+            transform: translateX(5px);
+        }
+        
+        .threat-item::before {
+            content: "⚠️";
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .dread-calculator {
+            background: #f0f9ff;
+            border: 2px solid #0ea5e9;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+        
+        .dread-factor {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            background: white;
+            margin-bottom: 15px;
+            border-radius: 10px;
+        }
+        
+        .factor-name {
+            font-weight: 600;
+            color: #1e293b;
+        }
+        
+        .factor-slider {
+            width: 200px;
+            margin: 0 20px;
+        }
+        
+        .factor-value {
+            background: #0ea5e9;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            min-width: 40px;
+            text-align: center;
+        }
+        
+        .dread-result {
+            background: linear-gradient(135deg, #0ea5e9, #0284c7);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .dread-score {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .atasm-framework {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+        
+        .atasm-phase {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        
+        .phase-number {
+            position: absolute;
+            left: -15px;
+            top: 20px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .phase-content {
+            margin-left: 35px;
+        }
+        
+        .phase-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #92400e;
+            margin-bottom: 10px;
+        }
+        
+        .pasta-stages {
+            background: #ecfdf5;
+            border: 2px solid #10b981;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+        
+        .pasta-flow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .pasta-stage {
+            background: white;
+            border: 2px solid #10b981;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .pasta-stage:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .pasta-stage::after {
+            content: "→";
+            position: absolute;
+            right: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #10b981;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .pasta-stage:last-child::after {
+            display: none;
+        }
+        
+        .stage-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .stage-name {
+            font-weight: 700;
+            color: #047857;
+            margin-bottom: 5px;
+        }
+        
+        .stage-description {
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+        
+        .project-scenario {
+            background: linear-gradient(135deg, #fef3c7, #fed7aa);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+        
+        .scenario-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .scenario-icon {
+            font-size: 3rem;
+        }
+        
+        .scenario-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #78350f;
+        }
+        
+        .scenario-description {
+            color: #92400e;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+        
+        .mitigation-strategies {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .mitigation-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 15px;
+            background: #f8fafc;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #10b981;
+        }
+        
+        .mitigation-priority {
+            background: #10b981;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-right: 15px;
+        }
+        
+        .mitigation-content {
+            flex: 1;
+        }
+        
+        .mitigation-title {
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 5px;
+        }
+        
+        .mitigation-description {
+            color: #64748b;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .implementation-code {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Fira Code', 'Cascadia Code', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            position: relative;
+        }
+        
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #475569;
+        }
+        
+        .code-language {
+            background: #667eea;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .copy-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .copy-btn:hover {
+            background: #059669;
+            transform: scale(1.05);
+        }
+        
+        .interactive-demo {
+            background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+        
+        .demo-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .demo-button {
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid #6366f1;
+            border-radius: 8px;
+            color: #6366f1;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .demo-button:hover {
+            background: #6366f1;
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        .demo-button.active {
+            background: #6366f1;
+            color: white;
+        }
+        
+        .threat-visualization {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            min-height: 300px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .attack-flow {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            height: 250px;
+        }
+        
+        .flow-node {
+            background: white;
+            border: 3px solid #667eea;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+        
+        .flow-node.attacker {
+            border-color: #ef4444;
+            background: #fee2e2;
+        }
+        
+        .flow-node.target {
+            border-color: #10b981;
+            background: #d1fae5;
+        }
+        
+        .flow-arrow {
+            position: absolute;
+            top: 50%;
+            width: 100px;
+            height: 3px;
+            background: #667eea;
+            z-index: 1;
+        }
+        
+        .flow-arrow::after {
+            content: "▶";
+            position: absolute;
+            right: -10px;
+            top: -8px;
+            color: #667eea;
+        }
+        
+        .security-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .metric-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid #e5e7eb;
+            transition: all 0.3s ease;
+        }
+        
+        .metric-card:hover {
+            border-color: #667eea;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .metric-label {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+        
+        .risk-matrix {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+        }
+        
+        .risk-cell {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .risk-low {
+            background: #bbf7d0;
+            color: #14532d;
+        }
+        
+        .risk-medium {
+            background: #fef3c7;
+            color: #78350f;
+        }
+        
+        .risk-high {
+            background: #fed7aa;
+            color: #7c2d12;
+        }
+        
+        .risk-critical {
+            background: #fecaca;
+            color: #7f1d1d;
+        }
+        
+        .risk-cell:hover {
+            transform: scale(1.1);
+            z-index: 10;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .qa-checklist {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: white;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .checklist-item:hover {
+            background: #f1f5f9;
+            transform: translateX(5px);
+        }
+        
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #667eea;
+            border-radius: 6px;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .checkbox.checked {
+            background: #667eea;
+        }
+        
+        .checkbox.checked::after {
+            content: "✓";
+            color: white;
+            font-weight: bold;
+        }
+        
+        .checklist-label {
+            flex: 1;
+            color: #1e293b;
+        }
+        
+        .checklist-status {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .status-pending {
+            background: #fef3c7;
+            color: #78350f;
+        }
+        
+        .status-complete {
+            background: #d1fae5;
+            color: #14532d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛡️ Threat Modeling & Security QA</h1>
+            <p class="subtitle">Comprehensive Industry Projects with STRIDE, DREAD, ATASM & PASTA Methodologies</p>
+        </div>
+
+        <div class="methodology-selector">
+            <div class="method-tabs">
+                <div class="method-tab active" onclick="showMethodology('stride')">
+                    STRIDE Analysis
+                    <span class="method-badge">6 Categories</span>
+                </div>
+                <div class="method-tab" onclick="showMethodology('dread')">
+                    DREAD Calculator
+                    <span class="method-badge">Risk Score</span>
+                </div>
+                <div class="method-tab" onclick="showMethodology('atasm')">
+                    ATASM Framework
+                    <span class="method-badge">4 Phases</span>
+                </div>
+                <div class="method-tab" onclick="showMethodology('pasta')">
+                    PASTA Process
+                    <span class="method-badge">7 Stages</span>
+                </div>
+                <div class="method-tab" onclick="showMethodology('project')">
+                    Industry Project
+                    <span class="method-badge">Banking</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- STRIDE Analysis Section -->
+        <div id="stride" class="content-section active">
+            <div class="card">
+                <h2>🎯 STRIDE Threat Modeling Analysis</h2>
+                
+                <div class="project-scenario">
+                    <div class="scenario-header">
+                        <div class="scenario-icon">🏦</div>
+                        <div class="scenario-title">Online Banking Platform</div>
+                    </div>
+                    <p class="scenario-description">
+                        Analyzing security threats for a cloud-based banking platform handling 5 million daily transactions,
+                        with mobile apps, web portal, and API integrations for third-party services.
+                    </p>
+                </div>
+
+                <div class="stride-matrix">
+                    <div class="stride-category">
+                        <div class="stride-header">
+                            <div class="stride-icon">S</div>
+                            <div>
+                                <div class="stride-title">Spoofing Identity</div>
+                                <p style="color: #64748b; margin-top: 5px;">Pretending to be something or someone you're not</p>
+                            </div>
+                        </div>
+                        <ul class="threat-list">
+                            <li class="threat-item">Phishing attacks targeting customer credentials</li>
+                            <li class="threat-item">Man-in-the-middle attacks on mobile app communication</li>
+                            <li class="threat-item">DNS spoofing redirecting to malicious servers</li>
+                            <li class="threat-item">Token replay attacks on API authentication</li>
+                            <li class="threat-item">Certificate pinning bypass on mobile applications</li>
+                        </ul>
+                        <div class="mitigation-strategies">
+                            <div class="mitigation-item">
+                                <div class="mitigation-priority">P1</div>
+                                <div class="mitigation-content">
+                                    <div class="mitigation-title">Multi-Factor Authentication (MFA)</div>
+                                    <div class="mitigation-description">
+                                        Implement FIDO2/WebAuthn for passwordless authentication with biometric verification
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mitigation-item">
+                                <div class="mitigation-priority">P1</div>
+                                <div class="mitigation-content">
+                                    <div class="mitigation-title">Certificate Pinning</div>
+                                    <div class="mitigation-description">
+                                        Enforce certificate pinning in mobile apps with backup pins and update mechanism
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stride-category">
+                        <div class="stride-header">
+                            <div class="stride-icon">T</div>
+                            <div>
+                                <div class="stride-title">Tampering with Data</div>
+                                <p style="color: #64748b; margin-top: 5px;">Modifying data or code without authorization</p>
+                            </div>
+                        </div>
+                        <ul class="threat-list">
+                            <li class="threat-item">SQL injection in transaction processing</li>
+                            <li class="threat-item">Parameter manipulation in API requests</li>
+                            <li class="threat-item">Transaction amount tampering during transfer</li>
+                            <li class="threat-item">Cookie/session manipulation for privilege escalation</li>
+                            <li class="threat-item">Database record modification through compromised admin accounts</li>
+                        </ul>
+                        <div class="mitigation-strategies">
+                            <div class="mitigation-item">
+                                <div class="mitigation-priority">P1</div>
+                                <div class="mitigation-content">
+                                    <div class="mitigation-title">Input Validation & Parameterized Queries</div>
+                                    <div class="mitigation-description">
+                                        Implement strict input validation and use parameterized queries for all database operations
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mitigation-item">
+                                <div class="mitigation-priority">P2</div>
+                                <div class="mitigation-content">
+                                    <div class="mitigation-title">Cryptographic Signatures</div>
+                                    <div class="mitigation-description">
+                                        Use HMAC-SHA256 for request signing and verify integrity of all critical operations
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stride-category">
+                        <div class="stride-header">
+                            <div class="stride-icon">R</div>
+                            <div>
+                                <div class="stride-title">Repudiation</div>
+                                <p style="color: #64748b; margin-top: 5px;">Claiming you didn't do something or were not responsible</p>
+                            </div>
+                        </div>
+                        <ul class="threat-list">
+                            <li class="threat-item">Users denying transaction execution</li>
+                            <li class="threat-item">Administrators denying configuration changes</li>
+                            <li class="threat-item">Third-party services denying API calls</li>
+                            <li class="threat-item">Customers disputing authorized payments</li>
+                            <li class="threat-item">Internal users denying data access or modifications</li>
+                        </ul>
+                        <div class="mitigation-strategies">
+                            <div class="mitigation-item">
+                                <div class="mitigation-priority">P1</div>
+                                <div class="mitigation-content">
+                                    <div class="mitigation-title">Comprehensive Audit Logging</div>
+                                    <div class="mitigation-description">
+                                        Implement immutable audit logs with blockchain or append-only storage
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mitigation-item">
+                                <div class="mitigation-priority">P2</div>
+                                <div class="mitigation-content">
+                                    <div class="mitigation-title">Digital Signatures</div>
+                                    <div class="mitigation-description">
+                                        Require digital signatures for all high-value transactions with timestamp
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stride-category">
+                        <div class="stride-header">
+                            <div class="stride-icon">I</div>
+                            <div>
+                                <div class="stride-title">Information Disclosure</div>
+                                <p style="color: #64748b; margin-top: 5px;">Exposing information to unauthorized individuals</p>
+                            </div>
+                        </div>
+                        <ul class="threat-list">
+                            <li class="threat-item">Customer PII exposure through error messages</li>
+                            <li class="threat-item">API endpoints leaking sensitive data</li>
+                            <li class="threat-item">Unencrypted data in transit or at rest</li>
+                            <li class="threat-item">Debug information exposed in production</li>
+                            <li class="threat-item">Sensitive data in application logs</li>
+                        </ul>
+                        <div class="mitigation-strategies">
+                            <div class="mitigation-item">
+                                <div class="mitigation-priority">P1</div>
+                                <div class="mitigation-content">
+                                    <div class="mitigation-title">End-to-End Encryption</div>
+                                    <div class="mitigation-description">
+                                        Implement AES-256 encryption for data at rest and TLS 1.3 for data in transit
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mitigation-item">
+                                <div class="mitigation-priority">P1</div>
+                                <div class="mitigation-content">
+                                    <div class="mitigation-title">Data Masking & Tokenization</div>
+                                    <div class="mitigation-description">
+                                        Use tokenization for sensitive data and implement field-level encryption
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stride-category">
+                        <div class="stride-header">
+                            <div class="stride-icon">D</div>
+                            <div>
+                                <div class="stride-title">Denial of Service</div>
+                                <p style="color: #64748b; margin-top: 5px;">Making a system or service unavailable</p>
+                            </div>
+                        </div>
+                        <ul class="threat-list">
+                            <li class="threat-item">DDoS attacks on banking portal</li>
+                            <li class="threat-item">Resource exhaustion through API abuse</li>
+                            <li class="threat-item">Database connection pool exhaustion</li>
+                            <li class="threat-item">Account lockout attacks</li>
+                            <li class="threat-item">Algorithmic complexity attacks</li>
+                        </ul>
+                        <div class="mitigation-strategies">
+                            <div class="mitigation-item">
+                                <div class="mitigation-priority">P1</div>
+                                <div class="mitigation-content">
+                                    <div class="mitigation-title">DDoS Protection & Rate Limiting</div>
+                                    <div class="mitigation-description">
+                                        Deploy CloudFlare/AWS Shield with intelligent rate limiting per user/IP
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mitigation-item">
+                                <div class="mitigation-priority">P2</div>
+                                <div class="mitigation-content">
+                                    <div class="mitigation-title">Auto-scaling & Circuit Breakers</div>
+                                    <div class="mitigation-description">
+                                        Implement auto-scaling with circuit breaker pattern for resilience
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stride-category">
+                        <div class="stride-header">
+                            <div class="stride-icon">E</div>
+                            <div>
+                                <div class="stride-title">Elevation of Privilege</div>
+                                <p style="color: #64748b; margin-top: 5px;">Gaining capabilities without proper authorization</p>
+                            </div>
+                        </div>
+                        <ul class="threat-list">
+                            <li class="threat-item">Privilege escalation through IDOR vulnerabilities</li>
+                            <li class="threat-item">JWT token manipulation for role elevation</li>
+                            <li class="threat-item">SQL injection for admin access</li>
+                            <li class="threat-item">Buffer overflow in native components</li>
+                            <li class="threat-item">Broken access control in API endpoints</li>
+                        </ul>
+                        <div class="mitigation-strategies">
+                            <div class="mitigation-item">
+                                <div class="mitigation-priority">P1</div>
+                                <div class="mitigation-content">
+                                    <div class="mitigation-title">Principle of Least Privilege</div>
+                                    <div class="mitigation-description">
+                                        Implement RBAC with fine-grained permissions and regular access reviews
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mitigation-item">
+                                <div class="mitigation-priority">P1</div>
+                                <div class="mitigation-content">
+                                    <div class="mitigation-title">Zero Trust Architecture</div>
+                                    <div class="mitigation-description">
+                                        Verify every request regardless of source with continuous authentication
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="implementation-code">
+                    <div class="code-header">
+                        <span class="code-language">Python - STRIDE Implementation</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy Code</button>
+                    </div>
+                    <pre>
+# STRIDE Threat Modeling Implementation for Banking Platform
+import hashlib
+import jwt
+import logging
+from datetime import datetime, timedelta
+from cryptography.fernet import Fernet
+import rate_limiter
+from typing import Dict, Any, Optional
+
+class STRIDESecurityFramework:
+    """Implementation of STRIDE security controls for banking platform"""
+    
+    def __init__(self):
+        self.audit_logger = self._setup_audit_logging()
+        self.encryption_key = Fernet.generate_key()
+        self.cipher_suite = Fernet(self.encryption_key)
+        
+    # SPOOFING MITIGATION
+    def implement_mfa_authentication(self, user_credentials: Dict[str, Any]) -> Dict[str, Any]:
+        """Multi-factor authentication with TOTP/FIDO2"""
+        try:
+            # Step 1: Verify primary credentials
+            if not self._verify_credentials(user_credentials):
+                self.audit_logger.warning(f"Failed login attempt for user: {user_credentials.get('username')}")
+                return {"status": "failed", "reason": "Invalid credentials"}
+            
+            # Step 2: Generate and send OTP
+            otp_token = self._generate_otp(user_credentials['username'])
+            
+            # Step 3: Implement WebAuthn for biometric
+            webauthn_challenge = self._create_webauthn_challenge()
+            
+            # Step 4: Certificate validation for mobile apps
+            if user_credentials.get('client_type') == 'mobile':
+                cert_valid = self._verify_certificate_pinning(
+                    user_credentials.get('cert_hash')
+                )
+                if not cert_valid:
+                    self.audit_logger.error(f"Certificate pinning failed for user: {user_credentials.get('username')}")
+                    return {"status": "failed", "reason": "Certificate validation failed"}
+            
+            return {
+                "status": "mfa_required",
+                "otp_sent": True,
+                "webauthn_challenge": webauthn_challenge,
+                "session_token": self._generate_secure_session_token(user_credentials['username'])
+            }
+            
+        except Exception as e:
+            self.audit_logger.error(f"MFA implementation error: {str(e)}")
+            raise
+    
+    # TAMPERING MITIGATION
+    def validate_transaction_integrity(self, transaction: Dict[str, Any]) -> bool:
+        """Validate transaction data integrity using HMAC"""
+        try:
+            # Extract transaction data and signature
+            tx_data = transaction.get('data')
+            provided_signature = transaction.get('signature')
+            
+            # Validate input parameters
+            if not self._validate_input_parameters(tx_data):
+                self.audit_logger.warning(f"Invalid transaction parameters: {tx_data}")
+                return False
+            
+            # Calculate expected signature
+            expected_signature = self._calculate_hmac(tx_data)
+            
+            # Verify signature matches
+            if not self._constant_time_compare(provided_signature, expected_signature):
+                self.audit_logger.error(f"Transaction tampering detected for: {tx_data.get('transaction_id')}")
+                return False
+            
+            # Additional validation for amount limits
+            if not self._validate_transaction_limits(tx_data):
+                return False
+            
+            # Store transaction hash for non-repudiation
+            self._store_transaction_hash(tx_data)
+            
+            return True
+            
+        except Exception as e:
+            self.audit_logger.error(f"Transaction validation error: {str(e)}")
+            return False
+    
+    # REPUDIATION MITIGATION
+    def create_audit_trail(self, action: Dict[str, Any]) -> str:
+        """Create immutable audit trail with digital signatures"""
+        try:
+            audit_entry = {
+                "timestamp": datetime.utcnow().isoformat(),
+                "user_id": action.get('user_id'),
+                "action_type": action.get('type'),
+                "action_details": action.get('details'),
+                "ip_address": action.get('ip_address'),
+                "user_agent": action.get('user_agent'),
+                "session_id": action.get('session_id')
+            }
+            
+            # Generate digital signature
+            signature = self._sign_audit_entry(audit_entry)
+            audit_entry['signature'] = signature
+            
+            # Calculate blockchain-style hash
+            previous_hash = self._get_previous_audit_hash()
+            current_hash = self._calculate_audit_hash(audit_entry, previous_hash)
+            audit_entry['hash'] = current_hash
+            audit_entry['previous_hash'] = previous_hash
+            
+            # Store in immutable audit log
+            self._store_immutable_audit(audit_entry)
+            
+            # Real-time alerting for critical actions
+            if action.get('type') in ['ADMIN_ACCESS', 'HIGH_VALUE_TRANSFER', 'CONFIG_CHANGE']:
+                self._send_security_alert(audit_entry)
+            
+            return current_hash
+            
+        except Exception as e:
+            self.audit_logger.error(f"Audit trail creation error: {str(e)}")
+            raise
+    
+    # INFORMATION DISCLOSURE MITIGATION
+    def encrypt_sensitive_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Implement field-level encryption for sensitive data"""
+        try:
+            encrypted_data = {}
+            sensitive_fields = ['ssn', 'account_number', 'credit_card', 'pin', 'password']
+            
+            for field, value in data.items():
+                if field in sensitive_fields:
+                    # Field-level encryption
+                    encrypted_value = self.cipher_suite.encrypt(str(value).encode())
+                    encrypted_data[field] = encrypted_value.decode()
+                    
+                    # Tokenization for display
+                    encrypted_data[f"{field}_token"] = self._tokenize_data(value)
+                else:
+                    # Non-sensitive data
+                    encrypted_data[field] = value
+            
+            # Add encryption metadata
+            encrypted_data['encryption_version'] = "v2.0"
+            encrypted_data['encrypted_at'] = datetime.utcnow().isoformat()
+            
+            return encrypted_data
+            
+        except Exception as e:
+            self.audit_logger.error(f"Encryption error: {str(e)}")
+            raise
+    
+    # DENIAL OF SERVICE MITIGATION
+    @rate_limiter.limit("100 per minute")
+    def process_api_request(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        """Process API request with rate limiting and circuit breaker"""
+        try:
+            # Check rate limits per user
+            user_id = request.get('user_id')
+            if not self._check_user_rate_limit(user_id):
+                return {"error": "Rate limit exceeded", "retry_after": 60}
+            
+            # Implement circuit breaker
+            if self._circuit_breaker_open(request.get('endpoint')):
+                return {"error": "Service temporarily unavailable", "retry_after": 30}
+            
+            # Validate request complexity
+            if not self._validate_request_complexity(request):
+                return {"error": "Request complexity exceeds limits"}
+            
+            # Process request with timeout
+            result = self._process_with_timeout(request, timeout=5)
+            
+            return result
+            
+        except Exception as e:
+            self.audit_logger.error(f"API processing error: {str(e)}")
+            raise
+    
+    # ELEVATION OF PRIVILEGE MITIGATION
+    def enforce_access_control(self, user: Dict[str, Any], resource: str, action: str) -> bool:
+        """Enforce Zero Trust access control with continuous verification"""
+        try:
+            # Verify JWT token
+            token = user.get('token')
+            if not self._verify_jwt_token(token):
+                self.audit_logger.warning(f"Invalid token for user: {user.get('user_id')}")
+                return False
+            
+            # Check RBAC permissions
+            user_role = self._get_user_role(user.get('user_id'))
+            if not self._check_rbac_permission(user_role, resource, action):
+                self.audit_logger.warning(
+                    f"Unauthorized access attempt - User: {user.get('user_id')}, "
+                    f"Resource: {resource}, Action: {action}"
+                )
+                return False
+            
+            # Verify request context (Zero Trust)
+            context_valid = self._verify_request_context({
+                "user_id": user.get('user_id'),
+                "ip_address": user.get('ip_address'),
+                "device_id": user.get('device_id'),
+                "location": user.get('location'),
+                "time": datetime.utcnow()
+            })
+            
+            if not context_valid:
+                self.audit_logger.error(f"Context verification failed for user: {user.get('user_id')}")
+                return False
+            
+            # Additional check for privileged operations
+            if action in ['DELETE', 'ADMIN_WRITE', 'CONFIG_CHANGE']:
+                if not self._verify_privileged_operation(user, action):
+                    return False
+            
+            # Log successful access
+            self.create_audit_trail({
+                "user_id": user.get('user_id'),
+                "type": "ACCESS_GRANTED",
+                "details": f"Resource: {resource}, Action: {action}"
+            })
+            
+            return True
+            
+        except Exception as e:
+            self.audit_logger.error(f"Access control error: {str(e)}")
+            return False
+    
+    # Supporting methods
+    def _setup_audit_logging(self) -> logging.Logger:
+        """Setup secure audit logging"""
+        logger = logging.getLogger('STRIDE_AUDIT')
+        logger.setLevel(logging.INFO)
+        
+        # Create secure file handler with encryption
+        handler = logging.FileHandler('/secure/audit/stride_audit.log')
+        formatter = logging.Formatter(
+            '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        )
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        
+        return logger
+    
+    def _calculate_hmac(self, data: Dict[str, Any]) -> str:
+        """Calculate HMAC-SHA256 for data integrity"""
+        import hmac
+        secret_key = b"your-secret-key-here"
+        message = json.dumps(data, sort_keys=True).encode()
+        return hmac.new(secret_key, message, hashlib.sha256).hexdigest()
+
+# Usage Example
+if __name__ == "__main__":
+    stride_framework = STRIDESecurityFramework()
+    
+    # Test MFA authentication
+    auth_result = stride_framework.implement_mfa_authentication({
+        "username": "john.doe",
+        "password": "hashed_password",
+        "client_type": "mobile",
+        "cert_hash": "abc123..."
+    })
+    print(f"Authentication Result: {auth_result}")
+    
+    # Validate transaction integrity
+    transaction_valid = stride_framework.validate_transaction_integrity({
+        "data": {
+            "transaction_id": "TX123456",
+            "amount": 10000,
+            "from_account": "ACC001",
+            "to_account": "ACC002"
+        },
+        "signature": "calculated_signature_here"
+    })
+    print(f"Transaction Valid: {transaction_valid}")
+                    </pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- DREAD Calculator Section -->
+        <div id="dread" class="content-section">
+            <div class="card">
+                <h2>📊 DREAD Risk Assessment Calculator</h2>
+                
+                <div class="project-scenario">
+                    <div class="scenario-header">
+                        <div class="scenario-icon">🚨</div>
+                        <div class="scenario-title">SQL Injection Vulnerability Assessment</div>
+                    </div>
+                    <p class="scenario-description">
+                        Evaluating the risk score for a discovered SQL injection vulnerability in the customer portal
+                        login page that could potentially expose the entire customer database.
+                    </p>
+                </div>
+
+                <div class="dread-calculator">
+                    <h3>Calculate DREAD Score</h3>
+                    
+                    <div class="dread-factor">
+                        <div class="factor-name">
+                            <strong>Damage Potential</strong>
+                            <div style="font-size: 0.9rem; color: #64748b;">
+                                How much damage could this attack cause?
+                            </div>
+                        </div>
+                        <input type="range" class="factor-slider" id="damage" min="0" max="10" value="8" onchange="calculateDREAD()">
+                        <div class="factor-value" id="damage-value">8</div>
+                    </div>
+
+                    <div class="dread-factor">
+                        <div class="factor-name">
+                            <strong>Reproducibility</strong>
+                            <div style="font-size: 0.9rem; color: #64748b;">
+                                How easy is it to reproduce the attack?
+                            </div>
+                        </div>
+                        <input type="range" class="factor-slider" id="reproducibility" min="0" max="10" value="9" onchange="calculateDREAD()">
+                        <div class="factor-value" id="reproducibility-value">9</div>
+                    </div>
+
+                    <div class="dread-factor">
+                        <div class="factor-name">
+                            <strong>Exploitability</strong>
+                            <div style="font-size: 0.9rem; color: #64748b;">
+                                How easy is it to launch this attack?
+                            </div>
+                        </div>
+                        <input type="range" class="factor-slider" id="exploitability" min="0" max="10" value="7" onchange="calculateDREAD()">
+                        <div class="factor-value" id="exploitability-value">7</div>
+                    </div>
+
+                    <div class="dread-factor">
+                        <div class="factor-name">
+                            <strong>Affected Users</strong>
+                            <div style="font-size: 0.9rem; color: #64748b;">
+                                How many users would be affected?
+                            </div>
+                        </div>
+                        <input type="range" class="factor-slider" id="affected" min="0" max="10" value="10" onchange="calculateDREAD()">
+                        <div class="factor-value" id="affected-value">10</div>
+                    </div>
+
+                    <div class="dread-factor">
+                        <div class="factor-name">
+                            <strong>Discoverability</strong>
+                            <div style="font-size: 0.9rem; color: #64748b;">
+                                How easy is it to find this vulnerability?
+                            </div>
+                        </div>
+                        <input type="range" class="factor-slider" id="discoverability" min="0" max="10" value="8" onchange="calculateDREAD()">
+                        <div class="factor-value" id="discoverability-value">8</div>
+                    </div>
+
+                    <div class="dread-result">
+                        <div class="dread-score" id="dread-total">8.4</div>
+                        <div>DREAD Risk Score</div>
+                        <div id="risk-level" style="margin-top: 10px; font-size: 1.2rem;">CRITICAL RISK</div>
+                    </div>
+                </div>
+
+                <div class="threat-grid">
+                    <div class="threat-card">
+                        <div class="threat-header">
+                            <div class="threat-title">Authentication Bypass</div>
+                            <div class="threat-severity severity-critical">CRITICAL</div>
+                        </div>
+                        <div class="threat-description">
+                            Vulnerability allowing attackers to bypass authentication mechanisms and gain unauthorized access to user accounts.
+                        </div>
+                        <div class="threat-metrics">
+                            <div class="metric-badge">D: 9/10</div>
+                            <div class="metric-badge">R: 8/10</div>
+                            <div class="metric-badge">E: 7/10</div>
+                            <div class="metric-badge">A: 10/10</div>
+                            <div class="metric-badge">D: 6/10</div>
+                        </div>
+                    </div>
+
+                    <div class="threat-card">
+                        <div class="threat-header">
+                            <div class="threat-title">XSS in Payment Form</div>
+                            <div class="threat-severity severity-high">HIGH</div>
+                        </div>
+                        <div class="threat-description">
+                            Cross-site scripting vulnerability in payment processing form that could steal credit card information.
+                        </div>
+                        <div class="threat-metrics">
+                            <div class="metric-badge">D: 7/10</div>
+                            <div class="metric-badge">R: 9/10</div>
+                            <div class="metric-badge">E: 8/10</div>
+                            <div class="metric-badge">A: 6/10</div>
+                            <div class="metric-badge">D: 7/10</div>
+                        </div>
+                    </div>
+
+                    <div class="threat-card">
+                        <div class="threat-header">
+                            <div class="threat-title">API Rate Limiting Bypass</div>
+                            <div class="threat-severity severity-medium">MEDIUM</div>
+                        </div>
+                        <div class="threat-description">
+                            Weakness in rate limiting implementation allowing attackers to overwhelm API endpoints.
+                        </div>
+                        <div class="threat-metrics">
+                            <div class="metric-badge">D: 5/10</div>
+                            <div class="metric-badge">R: 8/10</div>
+                            <div class="metric-badge">E: 6/10</div>
+                            <div class="metric-badge">A: 7/10</div>
+                            <div class="metric-badge">D: 8/10</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="risk-matrix">
+                    <div class="risk-cell risk-low">Low<br>1-2</div>
+                    <div class="risk-cell risk-low">Low<br>2-3</div>
+                    <div class="risk-cell risk-medium">Med<br>3-4</div>
+                    <div class="risk-cell risk-medium">Med<br>4-5</div>
+                    <div class="risk-cell risk-high">High<br>5-6</div>
+                    <div class="risk-cell risk-low">Low<br>2-3</div>
+                    <div class="risk-cell risk-medium">Med<br>3-4</div>
+                    <div class="risk-cell risk-medium">Med<br>4-5</div>
+                    <div class="risk-cell risk-high">High<br>5-6</div>
+                    <div class="risk-cell risk-high">High<br>6-7</div>
+                    <div class="risk-cell risk-medium">Med<br>3-4</div>
+                    <div class="risk-cell risk-medium">Med<br>4-5</div>
+                    <div class="risk-cell risk-high">High<br>5-6</div>
+                    <div class="risk-cell risk-high">High<br>6-7</div>
+                    <div class="risk-cell risk-critical">Crit<br>7-8</div>
+                    <div class="risk-cell risk-medium">Med<br>4-5</div>
+                    <div class="risk-cell risk-high">High<br>5-6</div>
+                    <div class="risk-cell risk-high">High<br>6-7</div>
+                    <div class="risk-cell risk-critical">Crit<br>7-8</div>
+                    <div class="risk-cell risk-critical">Crit<br>8-9</div>
+                    <div class="risk-cell risk-high">High<br>5-6</div>
+                    <div class="risk-cell risk-high">High<br>6-7</div>
+                    <div class="risk-cell risk-critical">Crit<br>7-8</div>
+                    <div class="risk-cell risk-critical">Crit<br>8-9</div>
+                    <div class="risk-cell risk-critical">Crit<br>9-10</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ATASM Framework Section -->
+        <div id="atasm" class="content-section">
+            <div class="card">
+                <h2>🏗️ ATASM Framework Implementation</h2>
+                
+                <div class="project-scenario">
+                    <div class="scenario-header">
+                        <div class="scenario-icon">☁️</div>
+                        <div class="scenario-title">Cloud-Native Microservices Architecture</div>
+                    </div>
+                    <p class="scenario-description">
+                        Applying ATASM framework to analyze and secure a cloud-native banking platform with 
+                        50+ microservices deployed on Kubernetes, using service mesh and API gateway.
+                    </p>
+                </div>
+
+                <div class="atasm-framework">
+                    <div class="atasm-phase">
+                        <div class="phase-number">1</div>
+                        <div class="phase-content">
+                            <div class="phase-title">Architecture Analysis</div>
+                            <p>Comprehensive analysis of system architecture, components, and data flows</p>
+                            
+                            <div class="implementation-code">
+                                <div class="code-header">
+                                    <span class="code-language">YAML - Architecture Definition</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">Copy Code</button>
+                                </div>
+                                <pre>
+# ATASM Architecture Definition
+architecture:
+  name: "Banking Microservices Platform"
+  type: "Cloud-Native"
+  components:
+    - name: "API Gateway"
+      type: "Kong/Istio"
+      exposure: "Internet-facing"
+      criticality: "HIGH"
+      security_controls:
+        - "OAuth 2.0 / OIDC"
+        - "Rate Limiting"
+        - "WAF Integration"
+        - "TLS Termination"
+    
+    - name: "Authentication Service"
+      type: "Microservice"
+      exposure: "Internal"
+      criticality: "CRITICAL"
+      security_controls:
+        - "MFA Implementation"
+        - "JWT Token Management"
+        - "Session Management"
+        - "Password Policy Enforcement"
+    
+    - name: "Payment Processing"
+      type: "Microservice"
+      exposure: "Internal"
+      criticality: "CRITICAL"
+      compliance: ["PCI-DSS"]
+      security_controls:
+        - "End-to-End Encryption"
+        - "Tokenization"
+        - "Fraud Detection"
+        - "Transaction Signing"
+    
+    - name: "Database Layer"
+      type: "PostgreSQL Cluster"
+      exposure: "Private Subnet"
+      criticality: "CRITICAL"
+      security_controls:
+        - "Encryption at Rest"
+        - "TDE (Transparent Data Encryption)"
+        - "Row-Level Security"
+        - "Audit Logging"
+    
+    - name: "Message Queue"
+      type: "Kafka"
+      exposure: "Internal"
+      criticality: "HIGH"
+      security_controls:
+        - "SASL/SSL Authentication"
+        - "ACL-based Authorization"
+        - "Message Encryption"
+    
+  data_flows:
+    - from: "Client Application"
+      to: "API Gateway"
+      protocol: "HTTPS"
+      data_classification: "PUBLIC/SENSITIVE"
+      
+    - from: "API Gateway"
+      to: "Authentication Service"
+      protocol: "gRPC/TLS"
+      data_classification: "SENSITIVE"
+      
+    - from: "Microservices"
+      to: "Database Layer"
+      protocol: "PostgreSQL/TLS"
+      data_classification: "CONFIDENTIAL"
+      
+  trust_boundaries:
+    - name: "Internet Boundary"
+      components: ["API Gateway", "CDN", "WAF"]
+      
+    - name: "Application Boundary"
+      components: ["Microservices", "Message Queue"]
+      
+    - name: "Data Boundary"
+      components: ["Database Layer", "Object Storage"]
+                                </pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="atasm-phase">
+                        <div class="phase-number">2</div>
+                        <div class="phase-content">
+                            <div class="phase-title">Threat Identification</div>
+                            <p>Systematic identification of threats using threat intelligence and attack patterns</p>
+                            
+                            <ul class="threat-list">
+                                <li class="threat-item">Container escape vulnerabilities in Kubernetes pods</li>
+                                <li class="threat-item">Service mesh misconfiguration leading to unauthorized access</li>
+                                <li class="threat-item">API Gateway bypass through direct service access</li>
+                                <li class="threat-item">Secrets exposure in container images or environment variables</li>
+                                <li class="threat-item">Supply chain attacks through compromised dependencies</li>
+                                <li class="threat-item">Lateral movement between microservices</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="atasm-phase">
+                        <div class="phase-number">3</div>
+                        <div class="phase-content">
+                            <div class="phase-title">Attack Surface Mapping</div>
+                            <p>Comprehensive mapping of all potential attack vectors and entry points</p>
+                            
+                            <div class="security-metrics">
+                                <div class="metric-card">
+                                    <div class="metric-value">15</div>
+                                    <div class="metric-label">External Endpoints</div>
+                                </div>
+                                <div class="metric-card">
+                                    <div class="metric-value">52</div>
+                                    <div class="metric-label">Microservices</div>
+                                </div>
+                                <div class="metric-card">
+                                    <div class="metric-value">180</div>
+                                    <div class="metric-label">API Routes</div>
+                                </div>
+                                <div class="metric-card">
+                                    <div class="metric-value">8</div>
+                                    <div class="metric-label">Data Stores</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="atasm-phase">
+                        <div class="phase-number">4</div>
+                        <div class="phase-content">
+                            <div class="phase-title">Mitigation Strategies</div>
+                            <p>Implementation of comprehensive security controls and countermeasures</p>
+                            
+                            <div class="mitigation-strategies">
+                                <div class="mitigation-item">
+                                    <div class="mitigation-priority">P1</div>
+                                    <div class="mitigation-content">
+                                        <div class="mitigation-title">Zero Trust Service Mesh</div>
+                                        <div class="mitigation-description">
+                                            Implement Istio with strict mTLS, RBAC policies, and service-to-service authentication
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mitigation-item">
+                                    <div class="mitigation-priority">P1</div>
+                                    <div class="mitigation-content">
+                                        <div class="mitigation-title">Runtime Security</div>
+                                        <div class="mitigation-description">
+                                            Deploy Falco for runtime threat detection and automated response to anomalies
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mitigation-item">
+                                    <div class="mitigation-priority">P2</div>
+                                    <div class="mitigation-content">
+                                        <div class="mitigation-title">Supply Chain Security</div>
+                                        <div class="mitigation-description">
+                                            Implement container signing, vulnerability scanning, and SBOM generation
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PASTA Process Section -->
+        <div id="pasta" class="content-section">
+            <div class="card">
+                <h2>🍝 PASTA (Process for Attack Simulation and Threat Analysis)</h2>
+                
+                <div class="pasta-stages">
+                    <div class="pasta-flow">
+                        <div class="pasta-stage">
+                            <div class="stage-icon">📋</div>
+                            <div class="stage-name">Stage 1</div>
+                            <div class="stage-description">Define Business Objectives</div>
+                        </div>
+                        <div class="pasta-stage">
+                            <div class="stage-icon">🏗️</div>
+                            <div class="stage-name">Stage 2</div>
+                            <div class="stage-description">Define Technical Scope</div>
+                        </div>
+                        <div class="pasta-stage">
+                            <div class="stage-icon">🔍</div>
+                            <div class="stage-name">Stage 3</div>
+                            <div class="stage-description">Application Decomposition</div>
+                        </div>
+                        <div class="pasta-stage">
+                            <div class="stage-icon">⚠️</div>
+                            <div class="stage-name">Stage 4</div>
+                            <div class="stage-description">Threat Analysis</div>
+                        </div>
+                        <div class="pasta-stage">
+                            <div class="stage-icon">🎯</div>
+                            <div class="stage-name">Stage 5</div>
+                            <div class="stage-description">Vulnerability Analysis</div>
+                        </div>
+                        <div class="pasta-stage">
+                            <div class="stage-icon">🔬</div>
+                            <div class="stage-name">Stage 6</div>
+                            <div class="stage-description">Attack Simulation</div>
+                        </div>
+                        <div class="pasta-stage">
+                            <div class="stage-icon">📊</div>
+                            <div class="stage-name">Stage 7</div>
+                            <div class="stage-description">Risk & Impact Analysis</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="implementation-code">
+                    <div class="code-header">
+                        <span class="code-language">Python - PASTA Implementation</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy Code</button>
+                    </div>
+                    <pre>
+# PASTA Threat Modeling Framework Implementation
+import json
+from typing import Dict, List, Any
+from dataclasses import dataclass
+from enum import Enum
+
+class ThreatSeverity(Enum):
+    CRITICAL = "Critical"
+    HIGH = "High"
+    MEDIUM = "Medium"
+    LOW = "Low"
+
+@dataclass
+class PASTAFramework:
+    """Implementation of PASTA threat modeling methodology"""
+    
+    def stage1_define_business_objectives(self) -> Dict[str, Any]:
+        """Stage 1: Define Business Objectives"""
+        return {
+            "business_objectives": [
+                {
+                    "id": "BO-001",
+                    "objective": "Ensure 99.99% availability for payment processing",
+                    "criticality": "CRITICAL",
+                    "compliance_requirements": ["PCI-DSS", "SOC2"],
+                    "risk_appetite": "Low"
+                },
+                {
+                    "id": "BO-002",
+                    "objective": "Protect customer PII and financial data",
+                    "criticality": "CRITICAL",
+                    "compliance_requirements": ["GDPR", "CCPA"],
+                    "risk_appetite": "Very Low"
+                },
+                {
+                    "id": "BO-003",
+                    "objective": "Maintain transaction processing under 200ms",
+                    "criticality": "HIGH",
+                    "compliance_requirements": [],
+                    "risk_appetite": "Medium"
+                }
+            ],
+            "stakeholders": ["CISO", "CTO", "Compliance Officer", "Product Owner"],
+            "business_impact_levels": {
+                "data_breach": "CATASTROPHIC",
+                "service_outage": "SEVERE",
+                "performance_degradation": "MODERATE"
+            }
+        }
+    
+    def stage2_define_technical_scope(self) -> Dict[str, Any]:
+        """Stage 2: Define Technical Scope"""
+        return {
+            "infrastructure": {
+                "cloud_provider": "AWS",
+                "regions": ["us-east-1", "eu-west-1"],
+                "services": [
+                    "EKS (Kubernetes)",
+                    "RDS (PostgreSQL)",
+                    "ElastiCache (Redis)",
+                    "S3",
+                    "CloudFront",
+                    "API Gateway"
+                ]
+            },
+            "applications": {
+                "frontend": ["React SPA", "Mobile Apps (iOS/Android)"],
+                "backend": ["Node.js APIs", "Python ML Services", "Java Payment Gateway"],
+                "databases": ["PostgreSQL", "MongoDB", "Redis"]
+            },
+            "network_architecture": {
+                "external_facing": ["API Gateway", "CloudFront CDN"],
+                "internal_services": ["Microservices", "Message Queues"],
+                "data_layer": ["RDS", "ElastiCache", "S3"]
+            },
+            "security_controls": {
+                "authentication": "OAuth 2.0 / OIDC",
+                "authorization": "RBAC with OPA",
+                "encryption": "TLS 1.3, AES-256",
+                "monitoring": "CloudWatch, Datadog, Splunk"
+            }
+        }
+    
+    def stage3_application_decomposition(self) -> Dict[str, Any]:
+        """Stage 3: Application Decomposition & Analysis"""
+        return {
+            "data_flow_analysis": [
+                {
+                    "flow_id": "DF-001",
+                    "name": "User Authentication Flow",
+                    "components": ["Mobile App", "API Gateway", "Auth Service", "User DB"],
+                    "data_classification": "SENSITIVE",
+                    "protocols": ["HTTPS", "gRPC"],
+                    "trust_boundaries_crossed": 2
+                },
+                {
+                    "flow_id": "DF-002",
+                    "name": "Payment Processing Flow",
+                    "components": ["Web App", "Payment Service", "Payment Gateway", "Transaction DB"],
+                    "data_classification": "CONFIDENTIAL",
+                    "protocols": ["HTTPS", "TLS"],
+                    "trust_boundaries_crossed": 3
+                }
+            ],
+            "trust_boundaries": [
+                {
+                    "id": "TB-001",
+                    "name": "Internet to DMZ",
+                    "controls": ["WAF", "DDoS Protection", "Rate Limiting"]
+                },
+                {
+                    "id": "TB-002",
+                    "name": "DMZ to Internal Network",
+                    "controls": ["API Gateway", "mTLS", "Network Segmentation"]
+                },
+                {
+                    "id": "TB-003",
+                    "name": "Application to Data Layer",
+                    "controls": ["Database Firewall", "Encryption", "Access Control"]
+                }
+            ],
+            "entry_points": [
+                {
+                    "id": "EP-001",
+                    "name": "Public API Endpoints",
+                    "protocol": "HTTPS",
+                    "authentication": "Required",
+                    "rate_limiting": "100 req/min"
+                },
+                {
+                    "id": "EP-002",
+                    "name": "Admin Portal",
+                    "protocol": "HTTPS",
+                    "authentication": "MFA Required",
+                    "ip_whitelist": True
+                }
+            ]
+        }
+    
+    def stage4_threat_analysis(self) -> List[Dict[str, Any]]:
+        """Stage 4: Threat Analysis"""
+        threats = [
+            {
+                "threat_id": "TH-001",
+                "name": "SQL Injection in Payment API",
+                "category": "Injection",
+                "likelihood": "Medium",
+                "impact": "Critical",
+                "affected_components": ["Payment Service", "Transaction DB"],
+                "attack_vector": "Malformed API requests",
+                "threat_actors": ["External Attackers", "Malicious Users"]
+            },
+            {
+                "threat_id": "TH-002",
+                "name": "Container Breakout in Kubernetes",
+                "category": "Privilege Escalation",
+                "likelihood": "Low",
+                "impact": "Critical",
+                "affected_components": ["EKS Cluster", "Container Runtime"],
+                "attack_vector": "Kernel vulnerabilities",
+                "threat_actors": ["Advanced Persistent Threats"]
+            },
+            {
+                "threat_id": "TH-003",
+                "name": "API Key Exposure in Mobile App",
+                "category": "Information Disclosure",
+                "likelihood": "High",
+                "impact": "High",
+                "affected_components": ["Mobile Applications", "API Gateway"],
+                "attack_vector": "Reverse engineering",
+                "threat_actors": ["Competitors", "Hackers"]
+            }
+        ]
+        return threats
+    
+    def stage5_vulnerability_analysis(self) -> Dict[str, Any]:
+        """Stage 5: Vulnerability & Weakness Analysis"""
+        return {
+            "vulnerabilities": [
+                {
+                    "vuln_id": "VUL-001",
+                    "description": "Outdated dependencies with known CVEs",
+                    "severity": "High",
+                    "cvss_score": 7.8,
+                    "affected_components": ["Node.js APIs"],
+                    "remediation": "Update dependencies to latest secure versions"
+                },
+                {
+                    "vuln_id": "VUL-002",
+                    "description": "Weak password policy enforcement",
+                    "severity": "Medium",
+                    "cvss_score": 5.3,
+                    "affected_components": ["Auth Service"],
+                    "remediation": "Implement strong password requirements and MFA"
+                }
+            ],
+            "security_testing_results": {
+                "sast_findings": 23,
+                "dast_findings": 15,
+                "dependency_vulnerabilities": 47,
+                "container_vulnerabilities": 12,
+                "infrastructure_misconfigurations": 8
+            }
+        }
+    
+    def stage6_attack_simulation(self) -> Dict[str, Any]:
+        """Stage 6: Attack Modeling & Simulation"""
+        return {
+            "attack_scenarios": [
+                {
+                    "scenario_id": "AS-001",
+                    "name": "Account Takeover Attack",
+                    "attack_chain": [
+                        "Phishing email to obtain credentials",
+                        "Bypass MFA using SS7 vulnerability",
+                        "Access user account",
+                        "Initiate fraudulent transactions"
+                    ],
+                    "probability": "Medium",
+                    "impact": "High",
+                    "detection_mechanisms": ["Anomaly detection", "Geo-location checks"],
+                    "mitigation_effectiveness": "70%"
+                },
+                {
+                    "scenario_id": "AS-002",
+                    "name": "Supply Chain Attack",
+                    "attack_chain": [
+                        "Compromise npm package",
+                        "Inject malicious code",
+                        "Deploy to production through CI/CD",
+                        "Exfiltrate sensitive data"
+                    ],
+                    "probability": "Low",
+                    "impact": "Critical",
+                    "detection_mechanisms": ["Dependency scanning", "SAST", "Runtime monitoring"],
+                    "mitigation_effectiveness": "60%"
+                }
+            ],
+            "red_team_findings": {
+                "successful_attacks": 3,
+                "partially_successful": 5,
+                "blocked_attacks": 12,
+                "undetected_activities": 2
+            }
+        }
+    
+    def stage7_risk_impact_analysis(self) -> Dict[str, Any]:
+        """Stage 7: Risk and Impact Analysis"""
+        return {
+            "risk_matrix": {
+                "critical_risks": [
+                    {
+                        "risk_id": "R-001",
+                        "description": "Data breach exposing customer PII",
+                        "likelihood_score": 3,
+                        "impact_score": 5,
+                        "risk_score": 15,
+                        "risk_level": "CRITICAL",
+                        "estimated_loss": "$5-10M",
+                        "mitigation_priority": "Immediate"
+                    }
+                ],
+                "high_risks": [
+                    {
+                        "risk_id": "R-002",
+                        "description": "DDoS attack causing service outage",
+                        "likelihood_score": 4,
+                        "impact_score": 3,
+                        "risk_score": 12,
+                        "risk_level": "HIGH",
+                        "estimated_loss": "$100K-500K per hour",
+                        "mitigation_priority": "Within 30 days"
+                    }
+                ],
+                "medium_risks": [],
+                "low_risks": []
+            },
+            "mitigation_roadmap": [
+                {
+                    "phase": "Immediate (0-30 days)",
+                    "actions": [
+                        "Implement WAF rules",
+                        "Enable MFA for all users",
+                        "Patch critical vulnerabilities"
+                    ],
+                    "budget": "$250,000",
+                    "resources": "5 Security Engineers"
+                },
+                {
+                    "phase": "Short-term (30-90 days)",
+                    "actions": [
+                        "Deploy runtime security monitoring",
+                        "Implement Zero Trust architecture",
+                        "Security training for developers"
+                    ],
+                    "budget": "$500,000",
+                    "resources": "10 Engineers + Consultants"
+                }
+            ],
+            "residual_risk": {
+                "acceptable": False,
+                "additional_controls_needed": True,
+                "executive_approval_required": True
+            }
+        }
+
+# Usage Example
+if __name__ == "__main__":
+    pasta = PASTAFramework()
+    
+    # Execute PASTA stages
+    print("🍝 PASTA Threat Modeling Process")
+    print("=" * 50)
+    
+    # Stage 1
+    business_objectives = pasta.stage1_define_business_objectives()
+    print(f"\n✅ Stage 1: {len(business_objectives['business_objectives'])} business objectives defined")
+    
+    # Stage 2
+    technical_scope = pasta.stage2_define_technical_scope()
+    print(f"✅ Stage 2: Technical scope covers {len(technical_scope['infrastructure']['services'])} AWS services")
+    
+    # Stage 3
+    app_decomposition = pasta.stage3_application_decomposition()
+    print(f"✅ Stage 3: Identified {len(app_decomposition['entry_points'])} entry points")
+    
+    # Stage 4
+    threats = pasta.stage4_threat_analysis()
+    print(f"✅ Stage 4: Analyzed {len(threats)} threats")
+    
+    # Stage 5
+    vulnerabilities = pasta.stage5_vulnerability_analysis()
+    print(f"✅ Stage 5: Found {sum(vulnerabilities['security_testing_results'].values())} total vulnerabilities")
+    
+    # Stage 6
+    attack_sim = pasta.stage6_attack_simulation()
+    print(f"✅ Stage 6: Simulated {len(attack_sim['attack_scenarios'])} attack scenarios")
+    
+    # Stage 7
+    risk_analysis = pasta.stage7_risk_impact_analysis()
+    print(f"✅ Stage 7: Identified {len(risk_analysis['risk_matrix']['critical_risks'])} critical risks")
+    
+    # Generate final report
+    print("\n📊 PASTA Analysis Complete!")
+    print(f"Total Budget Required: $750,000")
+    print(f"Timeline: 90 days")
+    print(f"Risk Reduction: 70% expected")
+                    </pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Industry Project Section -->
+        <div id="project" class="content-section">
+            <div class="card">
+                <h2>🏢 Industry Project: Complete Banking Platform Security Assessment</h2>
+                
+                <div class="interactive-demo">
+                    <h3>Interactive Threat Modeling Simulation</h3>
+                    <div class="demo-controls">
+                        <button class="demo-button active" onclick="simulateAttack('phishing')">Phishing Attack</button>
+                        <button class="demo-button" onclick="simulateAttack('injection')">SQL Injection</button>
+                        <button class="demo-button" onclick="simulateAttack('ddos')">DDoS Attack</button>
+                        <button class="demo-button" onclick="simulateAttack('insider')">Insider Threat</button>
+                    </div>
+                    
+                    <div class="threat-visualization">
+                        <div class="attack-flow" id="attack-visualization">
+                            <div class="flow-node attacker">
+                                <div style="font-weight: bold;">Attacker</div>
+                                <div style="font-size: 0.9rem;">External Threat</div>
+                            </div>
+                            <div class="flow-arrow" style="left: 25%;"></div>
+                            <div class="flow-node">
+                                <div style="font-weight: bold;">Entry Point</div>
+                                <div style="font-size: 0.9rem;">Email Gateway</div>
+                            </div>
+                            <div class="flow-arrow" style="left: 50%;"></div>
+                            <div class="flow-node">
+                                <div style="font-weight: bold;">Vulnerability</div>
+                                <div style="font-size: 0.9rem;">User Training</div>
+                            </div>
+                            <div class="flow-arrow" style="left: 75%;"></div>
+                            <div class="flow-node target">
+                                <div style="font-weight: bold;">Target</div>
+                                <div style="font-size: 0.9rem;">User Credentials</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="qa-checklist">
+                    <h3>Security QA Checklist</h3>
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="checklist-label">STRIDE analysis completed for all components</div>
+                        <div class="checklist-status status-pending">Pending</div>
+                    </div>
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="checklist-label">DREAD scoring for top 10 vulnerabilities</div>
+                        <div class="checklist-status status-pending">Pending</div>
+                    </div>
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="checklist-label">ATASM attack surface mapping documented</div>
+                        <div class="checklist-status status-pending">Pending</div>
+                    </div>
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="checklist-label">PASTA 7-stage analysis executed</div>
+                        <div class="checklist-status status-pending">Pending</div>
+                    </div>
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="checklist-label">Penetration testing completed</div>
+                        <div class="checklist-status status-pending">Pending</div>
+                    </div>
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="checklist-label">Security controls validated</div>
+                        <div class="checklist-status status-pending">Pending</div>
+                    </div>
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="checklist-label">Incident response plan tested</div>
+                        <div class="checklist-status status-pending">Pending</div>
+                    </div>
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="checklist-label">Compliance requirements verified</div>
+                        <div class="checklist-status status-pending">Pending</div>
+                    </div>
+                </div>
+
+                <div class="security-metrics">
+                    <div class="metric-card">
+                        <div class="metric-value">156</div>
+                        <div class="metric-label">Threats Identified</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">42</div>
+                        <div class="metric-label">Critical Findings</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">89%</div>
+                        <div class="metric-label">Mitigated</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">7.2</div>
+                        <div class="metric-label">Risk Score</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showMethodology(method) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(method).classList.add('active');
+            
+            // Update tabs
+            const tabs = document.querySelectorAll('.method-tab');
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        function calculateDREAD() {
+            // Get all factor values
+            const factors = ['damage', 'reproducibility', 'exploitability', 'affected', 'discoverability'];
+            let total = 0;
+            
+            factors.forEach(factor => {
+                const value = document.getElementById(factor).value;
+                document.getElementById(factor + '-value').textContent = value;
+                total += parseInt(value);
+            });
+            
+            // Calculate average
+            const average = (total / 5).toFixed(1);
+            document.getElementById('dread-total').textContent = average;
+            
+            // Determine risk level
+            let riskLevel = '';
+            if (average >= 8) {
+                riskLevel = 'CRITICAL RISK';
+                document.getElementById('risk-level').style.color = '#dc2626';
+            } else if (average >= 6) {
+                riskLevel = 'HIGH RISK';
+                document.getElementById('risk-level').style.color = '#ea580c';
+            } else if (average >= 4) {
+                riskLevel = 'MEDIUM RISK';
+                document.getElementById('risk-level').style.color = '#ca8a04';
+            } else {
+                riskLevel = 'LOW RISK';
+                document.getElementById('risk-level').style.color = '#2563eb';
+            }
+            document.getElementById('risk-level').textContent = riskLevel;
+        }
+
+        function simulateAttack(attackType) {
+            const visualization = document.getElementById('attack-visualization');
+            const attacks = {
+                'phishing': {
+                    attacker: 'External Threat',
+                    entry: 'Email Gateway',
+                    vulnerability: 'User Training',
+                    target: 'User Credentials'
+                },
+                'injection': {
+                    attacker: 'Malicious User',
+                    entry: 'Web Form',
+                    vulnerability: 'Input Validation',
+                    target: 'Database'
+                },
+                'ddos': {
+                    attacker: 'Botnet',
+                    entry: 'Public API',
+                    vulnerability: 'Rate Limiting',
+                    target: 'Service Availability'
+                },
+                'insider': {
+                    attacker: 'Malicious Insider',
+                    entry: 'Internal Access',
+                    vulnerability: 'Access Controls',
+                    target: 'Sensitive Data'
+                }
+            };
+
+            const attack = attacks[attackType];
+            visualization.innerHTML = `
+                <div class="flow-node attacker">
+                    <div style="font-weight: bold;">Attacker</div>
+                    <div style="font-size: 0.9rem;">${attack.attacker}</div>
+                </div>
+                <div class="flow-arrow" style="left: 20%;"></div>
+                <div class="flow-node">
+                    <div style="font-weight: bold;">Entry Point</div>
+                    <div style="font-size: 0.9rem;">${attack.entry}</div>
+                </div>
+                <div class="flow-arrow" style="left: 40%;"></div>
+                <div class="flow-node">
+                    <div style="font-weight: bold;">Vulnerability</div>
+                    <div style="font-size: 0.9rem;">${attack.vulnerability}</div>
+                </div>
+                <div class="flow-arrow" style="left: 60%;"></div>
+                <div class="flow-node target">
+                    <div style="font-weight: bold;">Target</div>
+                    <div style="font-size: 0.9rem;">${attack.target}</div>
+                </div>
+            `;
+
+            // Update active button
+            const buttons = document.querySelectorAll('.demo-button');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function toggleCheck(element) {
+            const checkbox = element.querySelector('.checkbox');
+            const status = element.querySelector('.checklist-status');
+            
+            checkbox.classList.toggle('checked');
+            
+            if (checkbox.classList.contains('checked')) {
+                status.textContent = 'Complete';
+                status.classList.remove('status-pending');
+                status.classList.add('status-complete');
+            } else {
+                status.textContent = 'Pending';
+                status.classList.remove('status-complete');
+                status.classList.add('status-pending');
+            }
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.closest('.implementation-code').querySelector('pre');
+            const code = codeBlock.textContent;
+            
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.style.background = '#10b981';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '';
+                }, 2000);
+            });
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            calculateDREAD();
+        });
+    </script>
+</body>
+</html>

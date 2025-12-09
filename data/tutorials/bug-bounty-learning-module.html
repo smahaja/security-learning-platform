@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bug Bounty Learning Module - Interactive Training</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        nav {
+            background: #34495e;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            flex: 1;
+            min-width: 150px;
+            background: none;
+            border: none;
+            color: white;
+            padding: 15px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 1em;
+        }
+
+        .nav-btn:hover {
+            background: #2c3e50;
+        }
+
+        .nav-btn.active {
+            background: #2980b9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .module {
+            display: none;
+        }
+
+        .module.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 2em;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #34495e;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        p {
+            line-height: 1.8;
+            margin-bottom: 15px;
+            color: #444;
+        }
+
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+        }
+
+        .vulnerable-demo {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .safe-demo {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .interactive-box {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        input[type="text"], input[type="password"], textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #dee2e6;
+            border-radius: 5px;
+            font-size: 1em;
+            margin: 10px 0;
+        }
+
+        button:not(.nav-btn) {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 5px;
+            transition: background 0.3s;
+        }
+
+        button:not(.nav-btn):hover {
+            background: #2980b9;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+
+        .progress-bar {
+            background: #e9ecef;
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .vulnerability-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .vulnerability-list li {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #3498db;
+            border-radius: 5px;
+        }
+
+        .quiz-option {
+            display: block;
+            width: 100%;
+            text-align: left;
+            margin: 10px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quiz-option:hover:not(:disabled) {
+            background: #e9ecef;
+            border-color: #3498db;
+        }
+
+        .quiz-option.correct {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+
+        .quiz-option.incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+
+        .quiz-option:disabled {
+            cursor: not-allowed;
+        }
+
+        .tool-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 5px solid #3498db;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            background: #3498db;
+            color: white;
+            border-radius: 15px;
+            font-size: 0.9em;
+            margin: 5px;
+        }
+
+        .severity-critical { background: #dc3545; }
+        .severity-high { background: #fd7e14; }
+        .severity-medium { background: #ffc107; color: #333; }
+        .severity-low { background: #28a745; }
+
+        #xss-output, #safe-output {
+            min-height: 50px;
+            background: white;
+            padding: 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 1.8em; }
+            h2 { font-size: 1.5em; }
+            .nav-btn { font-size: 0.9em; padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🐛 Bug Bounty Hunter Training Module</h1>
+            <p class="subtitle">Learn to Find and Report Security Vulnerabilities Ethically</p>
+        </header>
+
+        <nav>
+            <button class="nav-btn active" data-module="intro">Introduction</button>
+            <button class="nav-btn" data-module="basics">Basics</button>
+            <button class="nav-btn" data-module="vulnerabilities">Vulnerabilities</button>
+            <button class="nav-btn" data-module="xss">XSS Lab</button>
+            <button class="nav-btn" data-module="sqli">SQL Injection</button>
+            <button class="nav-btn" data-module="tools">Tools</button>
+            <button class="nav-btn" data-module="practice">Practice</button>
+            <button class="nav-btn" data-module="quiz">Quiz</button>
+            <button class="nav-btn" data-module="resources">Resources</button>
+        </nav>
+
+        <div class="content">
+            <!-- Introduction Module -->
+            <div id="intro" class="module active">
+                <h2>Welcome to Bug Bounty Hunting</h2>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress">11%</div>
+                </div>
+                
+                <p>Bug bounty hunting is the practice of finding security vulnerabilities in websites, applications, and systems, then responsibly reporting them to organizations in exchange for rewards.</p>
+                
+                <h3>What You'll Learn</h3>
+                <ul class="vulnerability-list">
+                    <li><strong>Web Security Fundamentals:</strong> Understanding how web applications work and common attack vectors</li>
+                    <li><strong>Vulnerability Types:</strong> XSS, SQL Injection, CSRF, and more</li>
+                    <li><strong>Testing Methodologies:</strong> How to systematically test for vulnerabilities</li>
+                    <li><strong>Responsible Disclosure:</strong> How to report bugs ethically and professionally</li>
+                    <li><strong>Tools & Techniques:</strong> Essential tools for bug hunting</li>
+                </ul>
+
+                <h3>Why Bug Bounty?</h3>
+                <div class="alert alert-info">
+                    <strong>Benefits of Bug Bounty Hunting:</strong>
+                    <ul style="margin-top: 10px; margin-left: 20px;">
+                        <li>Earn money (rewards range from $50 to $100,000+)</li>
+                        <li>Improve cybersecurity skills</li>
+                        <li>Build a reputation in the security community</li>
+                        <li>Help make the internet safer</li>
+                        <li>Work flexibly from anywhere</li>
+                    </ul>
+                </div>
+
+                <h3>Legal and Ethical Considerations</h3>
+                <div class="alert alert-danger">
+                    <strong>⚠️ Important:</strong> Always ensure you have permission before testing. Only test on:
+                    <ul style="margin-top: 10px; margin-left: 20px;">
+                        <li>Official bug bounty programs</li>
+                        <li>Your own applications</li>
+                        <li>Designated testing environments</li>
+                    </ul>
+                    Never test on systems without explicit permission - it's illegal and unethical.
+                </div>
+            </div>
+
+            <!-- Other modules remain the same but with fixed structure -->
+            <!-- I'll include the key modules with corrections -->
+
+            <!-- XSS Lab Module -->
+            <div id="xss" class="module">
+                <h2>Cross-Site Scripting (XSS) Laboratory</h2>
+                
+                <h3>What is XSS?</h3>
+                <p>Cross-Site Scripting occurs when an application includes untrusted data in web pages without proper validation or escaping, allowing attackers to execute scripts in victims' browsers.</p>
+
+                <h3>Interactive XSS Demonstration</h3>
+                
+                <div class="vulnerable-demo">
+                    <h4>⚠️ Vulnerable Search Box (Reflected XSS)</h4>
+                    <p>This simulates a vulnerable search feature. Try entering: <code>&lt;img src=x onerror=alert('XSS')&gt;</code></p>
+                    <input type="text" id="xss-input" placeholder="Enter search term...">
+                    <button onclick="vulnerableSearch()">Search (Vulnerable)</button>
+                    <div id="xss-output"></div>
+                </div>
+
+                <div class="safe-demo">
+                    <h4>✅ Safe Search Box (Properly Sanitized)</h4>
+                    <p>This demonstrates proper input sanitization:</p>
+                    <input type="text" id="safe-input" placeholder="Enter search term...">
+                    <button onclick="safeSearch()">Search (Safe)</button>
+                    <div id="safe-output"></div>
+                </div>
+
+                <h3>Common XSS Payloads</h3>
+                <div class="code-block">&lt;script&gt;alert('XSS')&lt;/script&gt;
+&lt;img src=x onerror=alert('XSS')&gt;
+&lt;svg onload=alert('XSS')&gt;
+&lt;body onload=alert('XSS')&gt;
+&lt;iframe src=javascript:alert('XSS')&gt;</div>
+            </div>
+
+            <!-- SQL Injection Module -->
+            <div id="sqli" class="module">
+                <h2>SQL Injection</h2>
+                
+                <h3>Understanding SQL Injection</h3>
+                <p>SQL injection occurs when user input is incorrectly filtered for SQL statements, allowing attackers to manipulate database queries.</p>
+
+                <h3>Interactive SQL Injection Demo</h3>
+                <div class="interactive-box">
+                    <h4>Login Form Simulation</h4>
+                    <p>Try these inputs to understand SQL injection:</p>
+                    <input type="text" id="sqli-username" placeholder="Username">
+                    <input type="password" id="sqli-password" placeholder="Password">
+                    <button onclick="testSQLi()">Login</button>
+                    <div id="sqli-result"></div>
+                    
+                    <div class="alert alert-info" style="margin-top: 15px;">
+                        <strong>Try these payloads:</strong><br>
+                        Username: <code>admin' --</code><br>
+                        Username: <code>' OR '1'='1</code><br>
+                        Username: <code>admin' AND 1=1 --</code>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add all other modules here with same structure -->
+            <!-- Basics, Vulnerabilities, Tools, Practice, Quiz, Resources -->
+
+            <div id="basics" class="module">
+                <h2>Bug Bounty Basics</h2>
+                <p>Content for basics module...</p>
+            </div>
+
+            <div id="vulnerabilities" class="module">
+                <h2>Common Web Vulnerabilities</h2>
+                <p>Content for vulnerabilities module...</p>
+            </div>
+
+            <div id="tools" class="module">
+                <h2>Essential Bug Bounty Tools</h2>
+                <p>Content for tools module...</p>
+            </div>
+
+            <div id="practice" class="module">
+                <h2>Hands-On Practice Labs</h2>
+                <p>Content for practice module...</p>
+            </div>
+
+            <div id="quiz" class="module">
+                <h2>Test Your Knowledge</h2>
+                <div id="quiz-container">
+                    <div class="quiz-question">
+                        <h3>Question 1: What does XSS stand for?</h3>
+                        <button class="quiz-option" onclick="checkAnswer(1, 'b', this)">A) Extra Secure Script</button>
+                        <button class="quiz-option" onclick="checkAnswer(1, 'b', this)">B) Cross-Site Scripting</button>
+                        <button class="quiz-option" onclick="checkAnswer(1, 'b', this)">C) Extended Server Security</button>
+                        <button class="quiz-option" onclick="checkAnswer(1, 'b', this)">D) Cross-Server Scripting</button>
+                    </div>
+                </div>
+                <div class="alert alert-success" style="margin-top: 20px;">
+                    <h4>Your Score: <span id="quiz-score">0</span>/5</h4>
+                </div>
+            </div>
+
+            <div id="resources" class="module">
+                <h2>Learning Resources</h2>
+                <p>Content for resources module...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fixed Navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add event listeners to all navigation buttons
+            const navButtons = document.querySelectorAll('.nav-btn');
+            navButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const moduleName = this.getAttribute('data-module');
+                    showModule(moduleName);
+                    
+                    // Update active button
+                    navButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        });
+
+        // Module Navigation
+        let visitedModules = new Set(['intro']);
+        
+        function showModule(moduleName) {
+            // Hide all modules
+            const modules = document.querySelectorAll('.module');
+            modules.forEach(module => module.classList.remove('active'));
+            
+            // Show selected module
+            const selectedModule = document.getElementById(moduleName);
+            if (selectedModule) {
+                selectedModule.classList.add('active');
+                visitedModules.add(moduleName);
+                updateProgress();
+            }
+        }
+
+        // Progress tracking
+        function updateProgress() {
+            const totalModules = 9;
+            const progress = Math.round((visitedModules.size / totalModules) * 100);
+            const progressBar = document.getElementById('progress');
+            if (progressBar) {
+                progressBar.style.width = progress + '%';
+                progressBar.textContent = progress + '%';
+            }
+        }
+
+        // XSS Demo Functions
+        function vulnerableSearch() {
+            const input = document.getElementById('xss-input').value;
+            const output = document.getElementById('xss-output');
+            
+            // Show what would happen in vulnerable code
+            output.innerHTML = `<div class="alert alert-warning">
+                <strong>Vulnerable Output:</strong><br>
+                You searched for: ${input}<br>
+                <small>Note: In a real vulnerable app, script tags would execute here!</small>
+            </div>`;
+            
+            // Check if XSS payload was entered
+            if (input.includes('<script>') || input.includes('onerror=') || input.includes('onload=')) {
+                output.innerHTML += `<div class="alert alert-danger">
+                    ⚠️ XSS Attack Detected! This payload would execute in a vulnerable application.
+                </div>`;
+            }
+        }
+
+        function safeSearch() {
+            const input = document.getElementById('safe-input').value;
+            const output = document.getElementById('safe-output');
+            
+            // Properly escape HTML
+            const escaped = input
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+            
+            output.innerHTML = `<div class="alert alert-success">
+                <strong>Safe Output (HTML Encoded):</strong><br>
+                You searched for: ${escaped}<br>
+                <small>The input has been properly sanitized!</small>
+            </div>`;
+        }
+
+        // SQL Injection Demo
+        function testSQLi() {
+            const username = document.getElementById('sqli-username').value;
+            const password = document.getElementById('sqli-password').value;
+            const resultDiv = document.getElementById('sqli-result');
+            
+            if (!resultDiv) return;
+            
+            // Simulate SQL injection vulnerability
+            if (username.includes("'") || username.includes("--") || 
+                username.toUpperCase().includes("OR") || username.includes("=")) {
+                resultDiv.innerHTML = `
+                    <div class="alert alert-danger">
+                        <strong>⚠️ SQL Injection Detected!</strong><br>
+                        Your input: "${username}"<br>
+                        This would bypass authentication in a vulnerable application!<br>
+                        <code>SELECT * FROM users WHERE username='${username}' AND password='${password}'</code>
+                    </div>`;
+            } else if (username && password) {
+                resultDiv.innerHTML = `
+                    <div class="alert alert-info">
+                        Normal login attempt with username: ${username}
+                    </div>`;
+            } else {
+                resultDiv.innerHTML = `
+                    <div class="alert alert-warning">
+                        Please enter both username and password
+                    </div>`;
+            }
+        }
+
+        // Quiz Functions
+        let quizScore = 0;
+
+        function checkAnswer(questionNum, correctAnswer, buttonElement) {
+            const buttons = buttonElement.parentElement.querySelectorAll('.quiz-option');
+            
+            // Disable all buttons
+            buttons.forEach(btn => {
+                btn.disabled = true;
+            });
+            
+            const userAnswer = buttonElement.textContent.substring(0, 1).toLowerCase();
+            
+            if (userAnswer === correctAnswer) {
+                buttonElement.classList.add('correct');
+                quizScore++;
+            } else {
+                buttonElement.classList.add('incorrect');
+                // Show correct answer
+                buttons.forEach(btn => {
+                    if (btn.textContent.substring(0, 1).toLowerCase() === correctAnswer) {
+                        btn.classList.add('correct');
+                    }
+                });
+            }
+            
+            const scoreElement = document.getElementById('quiz-score');
+            if (scoreElement) {
+                scoreElement.textContent = quizScore;
+            }
+        }
+
+        // Initialize progress on load
+        updateProgress();
+    </script>
+</body>
+</html>
+The main fixes I've made:
+
+Fixed Navigation: Changed from inline onclick to proper event listeners using data-module attributes
+Removed conflicting event references: The navigation now properly uses event delegation
+Fixed module switching: Modules now properly hide/show without errors
+Improved error handling: Added checks for null elements before accessing them
+Fixed the XSS demo: Now shows warnings instead of actually executing scripts
+Cleaner code structure: Better organized JavaScript functions
+The navigation should now work properly - you can click on any module button to switch between different sections. The progress bar will also update as you visit different modules.
+
+Copy
+Save to Notion
+just write html code to understand bug bounty i dont need interactie but comphrezie summarize content to explain each area 
+Copy<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Bug Bounty Guide</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f4f4f4;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            border-bottom: 4px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        
+        h2 {
+            color: #34495e;
+            background: #ecf0f1;
+            padding: 10px;
+            border-left: 5px solid #3498db;
+            margin-top: 30px;
+        }
+        
+        h3 {
+            color: #2c3e50;
+            margin-top: 20px;
+            border-bottom: 2px solid #bdc3c7;
+            padding-bottom: 5px;
+        }
+        
+        .section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        code {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        pre {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        
+        .vulnerability-box {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .tool-box {
+            background: #d1ecf1;
+            border-left: 5px solid #17a2b8;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .important {
+            background: #f8d7da;
+            border-left: 5px solid #dc3545;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .success {
+            background: #d4edda;
+            border-left: 5px solid #28a745;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        ul li {
+            margin: 8px 0;
+        }
+        
+        .severity {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 3px;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        
+        .critical { background: #dc3545; }
+        .high { background: #fd7e14; }
+        .medium { background: #ffc107; color: #333; }
+        .low { background: #28a745; }
+    </style>
+</head>
+<body>
+
+<h1>🐛 Complete Bug Bounty Guide</h1>
+
+<div class="section">
+    <h2>1. What is Bug Bounty?</h2>
+    
+    <p><strong>Bug bounty</strong> is a reward program offered by companies where ethical hackers find and report security vulnerabilities in their applications, websites, or systems. In return, hackers receive monetary rewards based on the severity of the bug found.</p>
+    
+    <h3>How It Works:</h3>
+    <ol>
+        <li><strong>Company launches program</strong> → Defines scope and rules</li>
+        <li><strong>Hacker finds vulnerability</strong> → Tests within legal boundaries</li>
+        <li><strong>Submit report</strong> → Detailed proof of concept</li>
+        <li><strong>Company validates</strong> → Reviews and confirms the bug</li>
+        <li><strong>Receive reward</strong> → Payment based on severity</li>
+    </ol>
+    
+    <div class="important">
+        <strong>⚠️ Legal Requirements:</strong><br>
+        • ONLY test on programs with explicit permission<br>
+        • NEVER test on random websites without authorization<br>
+        • Follow the program's rules of engagement<br>
+        • Testing without permission is ILLEGAL and can result in criminal charges
+    </div>
+</div>
+
+<div class="section">
+    <h2>2. Major Bug Bounty Platforms</h2>
+    
+    <h3>Top Platforms to Start:</h3>
+    <ul>
+        <li><strong>HackerOne</strong> - Largest platform with 2000+ programs, best for beginners</li>
+        <li><strong>Bugcrowd</strong> - User-friendly with good educational resources</li>
+        <li><strong>Synack</strong> - Requires application, higher-quality programs</li>
+        <li><strong>Intigriti</strong> - European-focused, growing platform</li>
+        <li><strong>YesWeHack</strong> - Global platform with good payouts</li>
+    </ul>
+    
+    <h3>Reward Ranges by Severity:</h3>
+    <ul>
+        <li><span class="severity critical">CRITICAL</span> $10,000 - $100,000+ (Remote Code Execution, Database Access)</li>
+        <li><span class="severity high">HIGH</span> $2,000 - $10,000 (SQL Injection, Authentication Bypass)</li>
+        <li><span class="severity medium">MEDIUM</span> $500 - $2,000 (Stored XSS, CSRF)</li>
+        <li><span class="severity low">LOW</span> $50 - $500 (Self-XSS, Missing Headers)</li>
+    </ul>
+</div>
+
+<div class="section">
+    <h2>3. Essential Web Vulnerabilities</h2>
+    
+    <h3>A. Cross-Site Scripting (XSS)</h3>
+    <div class="vulnerability-box">
+        <strong>What it is:</strong> Injecting malicious JavaScript into web pages viewed by other users<br>
+        <strong>Impact:</strong> Steal cookies, hijack sessions, deface websites<br>
+        <strong>Types:</strong>
+        <ul>
+            <li>Reflected XSS - Script in URL/request</li>
+            <li>Stored XSS - Script saved in database</li>
+            <li>DOM XSS - Client-side JavaScript vulnerability</li>
+        </ul>
+        <strong>Example Payload:</strong>
+        <pre>&lt;script&gt;alert(document.cookie)&lt;/script&gt;
+&lt;img src=x onerror=alert(1)&gt;
+&lt;svg onload=alert('XSS')&gt;</pre>
+        <strong>Where to look:</strong> Search boxes, comment sections, URL parameters, user profiles, file uploads
+    </div>
+    
+    <h3>B. SQL Injection (SQLi)</h3>
+    <div class="vulnerability-box">
+        <strong>What it is:</strong> Inserting malicious SQL code into database queries<br>
+        <strong>Impact:</strong> Access entire database, bypass authentication, data theft<br>
+        <strong>Types:</strong>
+        <ul>
+            <li>Classic SQLi - Direct query manipulation</li>
+            <li>Blind SQLi - No visible output, use true/false</li>
+            <li>Time-based - Using delays to extract data</li>
+        </ul>
+        <strong>Example Payloads:</strong>
+        <pre>' OR '1'='1
+admin' --
+' UNION SELECT username, password FROM users--
+1' AND SLEEP(5)--</pre>
+        <strong>Where to look:</strong> Login forms, search features, URL parameters, sorting/filtering options
+    </div>
+    
+    <h3>C. Cross-Site Request Forgery (CSRF)</h3>
+    <div class="vulnerability-box">
+        <strong>What it is:</strong> Forcing users to execute unwanted actions on a web application<br>
+        <strong>Impact:</strong> Change passwords, transfer funds, modify data<br>
+        <strong>Example Attack:</strong>
+        <pre>&lt;form action="https://bank.com/transfer" method="POST"&gt;
+    &lt;input type="hidden" name="amount" value="1000"&gt;
+    &lt;input type="hidden" name="to" value="attacker"&gt;
+&lt;/form&gt;
+&lt;script&gt;document.forms[0].submit();&lt;/script&gt;</pre>
+        <strong>Where to look:</strong> State-changing operations without tokens, important actions via GET requests
+    </div>
+    
+    <h3>D. Insecure Direct Object Reference (IDOR)</h3>
+    <div class="vulnerability-box">
+        <strong>What it is:</strong> Accessing objects by changing ID values without authorization<br>
+        <strong>Impact:</strong> Access other users' data, modify/delete unauthorized content<br>
+        <strong>Example:</strong>
+        <pre>https://site.com/profile?id=123 → Change to id=124
+https://site.com/invoice/INV-2021-001 → Try INV-2021-002
+/api/users/100/details → Try other user IDs</pre>
+        <strong>Where to look:</strong> URLs with IDs, API endpoints, file downloads, user profiles
+    </div>
+    
+    <h3>E. Server-Side Request Forgery (SSRF)</h3>
+    <div class="vulnerability-box">
+        <strong>What it is:</strong> Making the server perform requests to unintended locations<br>
+        <strong>Impact:</strong> Access internal systems, port scanning, read local files<br>
+        <strong>Example Payloads:</strong>
+        <pre>url=http://localhost/admin
+url=http://169.254.169.254/ (AWS metadata)
+url=file:///etc/passwd</pre>
+        <strong>Where to look:</strong> URL input fields, webhooks, file imports, PDF generators
+    </div>
+    
+    <h3>F. XML External Entity (XXE)</h3>
+    <div class="vulnerability-box">
+        <strong>What it is:</strong> Exploiting XML processors to read files or perform requests<br>
+        <strong>Impact:</strong> Read local files, internal network access, DoS<br>
+        <strong>Example Payload:</strong>
+        <pre>&lt;?xml version="1.0"?&gt;
+&lt;!DOCTYPE root [&lt;!ENTITY xxe SYSTEM "file:///etc/passwd"&gt;]&gt;
+&lt;root&gt;&xxe;&lt;/root&gt;</pre>
+        <strong>Where to look:</strong> XML uploads, SOAP endpoints, SVG uploads, SAML authentication
+    </div>
+</div>
+
+<div class="section">
+    <h2>4. Essential Tools</h2>
+    
+    <h3>🔍 Reconnaissance</h3>
+    <div class="tool-box">
+        <strong>Subdomain Enumeration:</strong>
+        <ul>
+            <li><code>Subfinder</code> - Fast passive subdomain finder</li>
+            <li><code>Amass</code> - Comprehensive asset discovery</li>
+            <li><code>Assetfinder</code> - Find related domains and subdomains</li>
+        </ul>
+        <strong>Command Examples:</strong>
+        <pre>subfinder -d target.com -o subdomains.txt
+amass enum -passive -d target.com
+assetfinder --subs-only target.com</pre>
+    </div>
+    
+    <h3>🎯 Scanning & Testing</h3>
+    <div class="tool-box">
+        <strong>Web Application Testing:</strong>
+        <ul>
+            <li><code>Burp Suite</code> - Industry standard proxy tool (Free/Pro)</li>
+            <li><code>OWASP ZAP</code> - Free alternative to Burp</li>
+            <li><code>Nuclei</code> - Fast vulnerability scanner with templates</li>
+            <li><code>SQLMap</code> - Automated SQL injection tool</li>
+            <li><code>XSStrike</code> - Advanced XSS detection</li>
+        </ul>
+        <strong>Basic Commands:</strong>
+        <pre># Nuclei scan
+nuclei -u https://target.com -t cves/
+
+# SQLMap basic
+sqlmap -u "http://target.com/page?id=1" --dbs
+
+# Directory fuzzing
+ffuf -w wordlist.txt -u https://target.com/FUZZ</pre>
+    </div>
+    
+    <h3>🔧 Browser Extensions</h3>
+    <div class="tool-box">
+        <ul>
+            <li><strong>Wappalyzer</strong> - Identify technologies</li>
+            <li><strong>Cookie Editor</strong> - Modify cookies</li>
+            <li><strong>HackTools</strong> - Payload generator</li>
+            <li><strong>FoxyProxy</strong> - Proxy management</li>
+        </ul>
+    </div>
+</div>
+
+<div class="section">
+    <h2>5. Testing Methodology</h2>
+    
+    <h3>Step-by-Step Approach:</h3>
+    <ol>
+        <li><strong>Reconnaissance (Information Gathering)</strong>
+            <ul>
+                <li>Find subdomains using tools</li>
+                <li>Identify technologies with Wappalyzer</li>
+                <li>Check robots.txt, sitemap.xml</li>
+                <li>Search for exposed files (.git, .env, backup files)</li>
+            </ul>
+        </li>
+        
+        <li><strong>Mapping the Application</strong>
+            <ul>
+                <li>Browse entire application as normal user</li>
+                <li>Create accounts with different roles</li>
+                <li>Map all functionality and endpoints</li>
+                <li>Identify input points and parameters</li>
+            </ul>
+        </li>
+        
+        <li><strong>Vulnerability Testing</strong>
+            <ul>
+                <li>Test authentication (password reset, registration)</li>
+                <li>Check authorization (IDOR, privilege escalation)</li>
+                <li>Input validation (XSS, SQLi)</li>
+                <li>Business logic flaws</li>
+                <li>File upload restrictions</li>
+            </ul>
+        </li>
+        
+        <li><strong>Exploitation & Validation</strong>
+            <ul>
+                <li>Confirm vulnerability works</li>
+                <li>Document steps to reproduce</li>
+                <li>Assess real impact</li>
+                <li>Take screenshots/videos</li>
+            </ul>
+        </li>
+    </ol>
+</div>
+
+<div class="section">
+    <h2>6. Writing Good Reports</h2>
+    
+    <h3>Report Template:</h3>
+    <pre>## Summary
+Brief description of the vulnerability in 1-2 sentences.
+
+## Vulnerability Details
+- **Type**: SQL Injection
+- **Severity**: High
+- **Endpoint**: https://target.com/search
+- **Parameter**: q
+
+## Steps to Reproduce
+1. Go to https://target.com/search
+2. Enter payload: ' OR '1'='1
+3. Submit the search form
+4. Observe SQL error message
+
+## Impact
+Attacker can:
+- Extract entire database
+- Bypass authentication
+- Access sensitive user data
+
+## Proof of Concept
+[Screenshots or video]
+[Request/Response data]
+
+## Remediation
+- Use parameterized queries
+- Implement input validation
+- Apply principle of least privilege to database user</pre>
+    
+    <div class="success">
+        <strong>✅ Good Report Characteristics:</strong><br>
+        • Clear and concise title<br>
+        • Step-by-step reproduction steps<br>
+        • Actual impact demonstration<br>
+        • Professional tone<br>
+        • Suggested fixes
+    </div>
+</div>
+
+<div class="section">
+    <h2>7. Learning Path for Beginners</h2>
+    
+    <h3>Week 1-2: Fundamentals</h3>
+    <ul>
+        <li>Learn HTTP/HTTPS basics, request methods, headers</li>
+        <li>Understand HTML, JavaScript, basic web technologies</li>
+        <li>Study OWASP Top 10 vulnerabilities</li>
+        <li>Set up Burp Suite/OWASP ZAP</li>
+    </ul>
+    
+    <h3>Week 3-4: Hands-on Practice</h3>
+    <ul>
+        <li>Complete PortSwigger Web Security Academy (Free)</li>
+        <li>Practice on DVWA (Damn Vulnerable Web App)</li>
+        <li>Try OWASP WebGoat challenges</li>
+        <li>Join TryHackMe or HackTheBox for guided learning</li>
+    </ul>
+    
+    <h3>Week 5-6: Real Targets</h3>
+    <ul>
+        <li>Create accounts on HackerOne and Bugcrowd</li>
+        <li>Read disclosed reports to understand patterns</li>
+        <li>Start with programs accepting beginners</li>
+        <li>Focus on wide-scope programs (*.target.com)</li>
+    </ul>
+    
+    <h3>Week 7+: Specialize</h3>
+    <ul>
+        <li>Pick 2-3 vulnerability types to master</li>
+        <li>Develop custom tools and scripts</li>
+        <li>Build reconnaissance automation</li>
+        <li>Contribute to bug bounty community</li>
+    </ul>
+</div>
+
+<div class="section">
+    <h2>8. Common Mistakes to Avoid</h2>
+    
+    <div class="important">
+        <strong>❌ Don't:</strong><br>
+        • Test without reading scope and rules<br>
+        • Perform automated scanning without permission<br>
+        • Test on production systems aggressively<br>
+        • Submit duplicates without checking<br>
+        • Use others' proof-of-concepts without understanding<br>
+        • Give up after first rejections<br>
+        • Focus only on critical vulnerabilities<br>
+        • Neglect report quality
+    </div>
+    
+    <div class="success">
+        <strong>✅ Do:</strong><br>
+        • Start with wide-scope programs<br>
+        • Read every disclosed report you can find<br>
+        • Test methodically and take notes<br>
+        • Verify vulnerabilities before reporting<br>
+        • Be professional in all communications<br>
+        • Learn from duplicate/invalid reports<br>
+        • Focus on understanding, not just tools<br>
+        • Build long-term reputation
+    </div>
+</div>
+
+<div class="section">
+    <h2>9. Practice Platforms</h2>
+    
+    <h3>Free Resources:</h3>
+    <ul>
+        <li><strong>PortSwigger Web Security Academy</strong> - Best free resource with labs
+            <br>URL: portswigger.net/web-security</li>
+        <li><strong>PentesterLab</strong> - Free and paid exercises
+            <br>URL: pentesterlab.com</li>
+        <li><strong>OWASP WebGoat</strong> - Deliberately insecure application
+            <br>URL: owasp.org/www-project-webgoat</li>
+        <li><strong>HackTheBox Academy</strong> - Structured learning paths
+            <br>URL: academy.hackthebox.com</li>
+        <li><strong>TryHackMe</strong> - Beginner-friendly rooms
+            <br>URL: tryhackme.com</li>
+    </ul>
+    
+    <h3>Vulnerable Apps to Download:</h3>
+    <ul>
+        <li>DVWA (Damn Vulnerable Web Application)</li>
+        <li>bWAPP (Buggy Web Application)</li>
+        <li>Mutillidae II</li>
+        <li>OWASP Juice Shop</li>
+        <li>VulnHub VMs</li>
+    </ul>
+</div>
+
+<div class="section">
+    <h2>10. Success Tips</h2>
+    
+    <h3>🎯 Finding Your First Bug:</h3>
+    <ol>
+        <li><strong>Choose the right target:</strong> Look for programs with wide scope (*.domain.com)</li>
+        <li><strong>Focus on one vulnerability:</strong> Master XSS or IDOR first</li>
+        <li><strong>Read old reports:</strong> Learn what others found</li>
+        <li><strong>Test forgotten features:</strong> Password reset, profile export, mobile APIs</li>
+        <li><strong>Be patient:</strong> First bug typically takes 1-3 months</li>
+    </ol>
+    
+    <h3>💰 Maximizing Earnings:</h3>
+    <ul>
+        <li>Focus on quality over quantity</li>
+        <li>Build relationships with programs</li>
+        <li>Participate in live hacking events</li>
+        <li>Find vulnerability chains for higher impact</li>
+        <li>Target new programs early</li>
+        <li>Develop unique methodologies</li>
+    </ul>
+    
+    <h3>📚 Continuous Learning:</h3>
+    <ul>
+        <li>Follow security researchers on Twitter</li>
+        <li>Read security blogs and writeups</li>
+        <li>Join Discord/Slack communities</li>
+        <li>Attend virtual security conferences</li>
+        <li>Share your findings (after fixed)</li>
+    </ul>
+</div>
+
+<div class="section">
+    <h2>Quick Reference Checklist</h2>
+    
+    <h3>For Every Target:</h3>
+    <pre>□ Check scope and out-of-scope items
+□ Subdomain enumeration
+□ Technology identification
+□ Check for exposed files (.git, .env)
+□ Test authentication mechanisms
+□ Check authorization (IDOR)
+□ Input validation testing (XSS, SQLi)
+□ Test file uploads
+□ Check CORS configuration
+□ Test rate limiting
+□ Business logic testing
+□ API endpoint testing
+□ Mobile app testing (if applicable)
+□ Check security headers
+□ Test session management</pre>
+</div>

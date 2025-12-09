@@ -1,0 +1,1600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure SDLC - Complete Guide for Cloud Security Architects</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1a202c;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 60px 40px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+            animation: slideRight 3s linear infinite;
+        }
+        
+        @keyframes slideRight {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        h1 {
+            font-size: 3rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+        
+        .subtitle {
+            color: #4a5568;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+        }
+        
+        .role-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+        
+        .nav-tabs {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .nav-tab {
+            padding: 12px 24px;
+            background: #f7fafc;
+            border: 2px solid transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .nav-tab:hover {
+            background: #edf2f7;
+            transform: translateY(-2px);
+        }
+        
+        .nav-tab.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .content-section {
+            display: none;
+        }
+        
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        h2 {
+            color: #2d3748;
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        h3 {
+            color: #4a5568;
+            font-size: 1.6rem;
+            margin: 25px 0 15px 0;
+        }
+        
+        h4 {
+            color: #718096;
+            font-size: 1.3rem;
+            margin: 20px 0 10px 0;
+        }
+        
+        .phase-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .phase-card {
+            background: linear-gradient(135deg, #f7fafc, #edf2f7);
+            border-radius: 15px;
+            padding: 25px;
+            border-left: 5px solid #667eea;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .phase-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+        
+        .phase-number {
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: white;
+            opacity: 0.1;
+        }
+        
+        .phase-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+        
+        .phase-description {
+            color: #4a5568;
+            margin-bottom: 15px;
+            line-height: 1.7;
+        }
+        
+        .security-activities {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        
+        .activity-item {
+            padding: 8px 0;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .activity-item::before {
+            content: "🔐";
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .best-practice {
+            background: linear-gradient(135deg, #48bb7815, #38a16915);
+            border: 2px solid #48bb78;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .best-practice-title {
+            font-weight: 700;
+            color: #22543d;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .warning-box {
+            background: #fed7d7;
+            border: 2px solid #fc8181;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .warning-title {
+            font-weight: 700;
+            color: #742a2a;
+            margin-bottom: 10px;
+        }
+        
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .tool-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .tool-card:hover {
+            border-color: #667eea;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tool-name {
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+        
+        .tool-category {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+        
+        .qa-section {
+            margin: 30px 0;
+        }
+        
+        .qa-item {
+            background: #f7fafc;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .qa-question {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .qa-question:hover {
+            padding-left: 25px;
+        }
+        
+        .qa-toggle {
+            font-size: 1.5rem;
+            transition: transform 0.3s;
+        }
+        
+        .qa-answer {
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .qa-answer.active {
+            padding: 25px;
+            max-height: 2000px;
+        }
+        
+        .maturity-levels {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .maturity-level {
+            text-align: center;
+            padding: 20px 10px;
+            background: white;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            position: relative;
+            transition: all 0.3s;
+        }
+        
+        .maturity-level:hover {
+            transform: scale(1.05);
+            border-color: #667eea;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .level-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .level-name {
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+        
+        .level-desc {
+            font-size: 0.85rem;
+            color: #718096;
+        }
+        
+        .cloud-architecture {
+            background: #f7fafc;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+        
+        .architecture-layer {
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        
+        .layer-title {
+            font-weight: 700;
+            color: #2d3748;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .layer-components {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .component-tag {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+        
+        .recommendation-card {
+            background: linear-gradient(135deg, #fbb6ce15, #f687b315);
+            border: 2px solid #f687b3;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+        
+        .recommendation-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #97266d;
+            margin-bottom: 15px;
+        }
+        
+        .recommendation-list {
+            list-style: none;
+        }
+        
+        .recommendation-item {
+            padding: 10px 0;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .recommendation-item::before {
+            content: "⭐";
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .metric-label {
+            font-size: 0.9rem;
+            opacity: 0.95;
+        }
+        
+        .process-flow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 30px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            overflow-x: auto;
+        }
+        
+        .process-step {
+            background: linear-gradient(135deg, #f7fafc, #edf2f7);
+            padding: 15px;
+            border-radius: 10px;
+            min-width: 150px;
+            text-align: center;
+            position: relative;
+            border: 2px solid #667eea;
+            flex-shrink: 0;
+        }
+        
+        .process-step::after {
+            content: "→";
+            position: absolute;
+            right: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #667eea;
+            font-size: 1.5rem;
+        }
+        
+        .process-step:last-child::after {
+            display: none;
+        }
+        
+        .code-block {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            line-height: 1.6;
+        }
+        
+        .code-title {
+            color: #68d391;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            background: white;
+        }
+        
+        tr:hover td {
+            background: #f7fafc;
+        }
+        
+        .checklist {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .checklist-item {
+            padding: 10px;
+            margin: 8px 0;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .checklist-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #667eea;
+            border-radius: 5px;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .checkbox.checked {
+            background: #667eea;
+        }
+        
+        .checkbox.checked::after {
+            content: "✓";
+            color: white;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .phase-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .maturity-levels {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔒 Secure Software Development Life Cycle (SDLC)</h1>
+        <p class="subtitle">Complete Guide with Cloud Security Architecture Best Practices</p>
+        <span class="role-badge">For Cloud Security Architects</span>
+    </div>
+
+    <div class="container">
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showSection('overview')">Overview</button>
+            <button class="nav-tab" onclick="showSection('phases')">SDLC Phases</button>
+            <button class="nav-tab" onclick="showSection('practices')">Best Practices</button>
+            <button class="nav-tab" onclick="showSection('tools')">Tools & Technologies</button>
+            <button class="nav-tab" onclick="showSection('cloud')">Cloud Architecture</button>
+            <button class="nav-tab" onclick="showSection('qa')">Q&A Section</button>
+            <button class="nav-tab" onclick="showSection('recommendations')">Recommendations</button>
+        </div>
+
+        <!-- OVERVIEW SECTION -->
+        <div id="overview" class="content-section active">
+            <div class="card">
+                <h2>🎯 What is Secure SDLC?</h2>
+                
+                <p style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 20px;">
+                    Secure Software Development Life Cycle (S-SDLC) is a process that integrates security practices into every phase of software development. Instead of treating security as an afterthought, S-SDLC makes it an integral part of the entire development process, from initial planning to deployment and maintenance.
+                </p>
+
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">60%</div>
+                        <div class="metric-label">Cost Reduction in Fixing Vulnerabilities</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">50%</div>
+                        <div class="metric-label">Faster Time to Market</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">75%</div>
+                        <div class="metric-label">Reduction in Security Incidents</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">85%</div>
+                        <div class="metric-label">Compliance Achievement Rate</div>
+                    </div>
+                </div>
+
+                <h3>Traditional SDLC vs Secure SDLC</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Aspect</th>
+                            <th>Traditional SDLC</th>
+                            <th>Secure SDLC</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Security Focus</strong></td>
+                            <td>End of development (testing phase)</td>
+                            <td>Every phase from planning</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cost of Fixes</strong></td>
+                            <td>High (found late in cycle)</td>
+                            <td>Low (found early)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Team Involvement</strong></td>
+                            <td>Security team only</td>
+                            <td>Everyone is responsible</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Vulnerability Detection</strong></td>
+                            <td>Manual, periodic</td>
+                            <td>Automated, continuous</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Compliance</strong></td>
+                            <td>Reactive</td>
+                            <td>Proactive, built-in</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Time to Market</strong></td>
+                            <td>Delayed by security fixes</td>
+                            <td>Faster, security built-in</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="process-flow">
+                    <div class="process-step">Planning</div>
+                    <div class="process-step">Design</div>
+                    <div class="process-step">Development</div>
+                    <div class="process-step">Testing</div>
+                    <div class="process-step">Deployment</div>
+                    <div class="process-step">Maintenance</div>
+                </div>
+
+                <h3>Core Principles of Secure SDLC</h3>
+                <div class="best-practice">
+                    <div class="best-practice-title">🎯 Security by Design</div>
+                    <p>Security requirements are considered from the very beginning of the project, not added as an afterthought. This includes threat modeling, security architecture reviews, and risk assessment during the planning phase.</p>
+                </div>
+
+                <div class="best-practice">
+                    <div class="best-practice-title">🔄 Continuous Security</div>
+                    <p>Security is not a one-time activity but a continuous process throughout the development lifecycle. This includes continuous integration of security testing, monitoring, and improvement.</p>
+                </div>
+
+                <div class="best-practice">
+                    <div class="best-practice-title">👥 Shared Responsibility</div>
+                    <p>Security is everyone's responsibility - developers, testers, operations, and security teams all play crucial roles in maintaining security throughout the SDLC.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- PHASES SECTION -->
+        <div id="phases" class="content-section">
+            <div class="card">
+                <h2>📊 Secure SDLC Phases Detailed</h2>
+                
+                <div class="phase-container">
+                    <div class="phase-card">
+                        <div class="phase-number">1</div>
+                        <div class="phase-title">📋 Phase 1: Planning & Requirements</div>
+                        <div class="phase-description">
+                            Define security objectives and requirements alongside functional requirements. This phase sets the security foundation for the entire project.
+                        </div>
+                        <div class="security-activities">
+                            <h4>Security Activities:</h4>
+                            <div class="activity-item">Security requirements gathering</div>
+                            <div class="activity-item">Risk assessment and analysis</div>
+                            <div class="activity-item">Compliance requirements identification</div>
+                            <div class="activity-item">Security budget allocation</div>
+                            <div class="activity-item">Define security acceptance criteria</div>
+                        </div>
+                        <div class="code-block">
+                            <div class="code-title"># Security Requirements Template</div>
+                            <pre>
+SECURITY_REQUIREMENTS = {
+    "Authentication": {
+        "MFA": "Required for privileged users",
+        "Password_Policy": "Min 12 chars, complexity required",
+        "Session_Timeout": "15 minutes idle"
+    },
+    "Data_Protection": {
+        "Encryption_At_Rest": "AES-256",
+        "Encryption_In_Transit": "TLS 1.3",
+        "Data_Classification": ["Public", "Internal", "Confidential"]
+    },
+    "Compliance": ["PCI-DSS", "GDPR", "HIPAA"],
+    "Availability": "99.99% uptime SLA"
+}
+                            </pre>
+                        </div>
+                    </div>
+
+                    <div class="phase-card">
+                        <div class="phase-number">2</div>
+                        <div class="phase-title">🏗️ Phase 2: Design & Architecture</div>
+                        <div class="phase-description">
+                            Create secure architecture and design patterns. Identify potential security issues before any code is written.
+                        </div>
+                        <div class="security-activities">
+                            <h4>Security Activities:</h4>
+                            <div class="activity-item">Threat modeling (STRIDE, PASTA)</div>
+                            <div class="activity-item">Security architecture review</div>
+                            <div class="activity-item">Secure design patterns selection</div>
+                            <div class="activity-item">Data flow diagrams with security controls</div>
+                            <div class="activity-item">Third-party component risk assessment</div>
+                        </div>
+                        <div class="code-block">
+                            <div class="code-title"># Threat Model Example</div>
+                            <pre>
+THREAT_MODEL = {
+    "Assets": ["Customer Data", "Payment Info", "API Keys"],
+    "Threats": [
+        {
+            "Type": "SQL Injection",
+            "Impact": "High",
+            "Likelihood": "Medium",
+            "Mitigation": "Parameterized queries, Input validation"
+        },
+        {
+            "Type": "Data Breach",
+            "Impact": "Critical",
+            "Likelihood": "Low",
+            "Mitigation": "Encryption, Access controls, DLP"
+        }
+    ],
+    "Security_Controls": ["WAF", "IDS/IPS", "SIEM", "DLP"]
+}
+                            </pre>
+                        </div>
+                    </div>
+
+                    <div class="phase-card">
+                        <div class="phase-number">3</div>
+                        <div class="phase-title">💻 Phase 3: Secure Coding & Development</div>
+                        <div class="phase-description">
+                            Implement secure coding practices and standards. Developers write code with security in mind from the start.
+                        </div>
+                        <div class="security-activities">
+                            <h4>Security Activities:</h4>
+                            <div class="activity-item">Secure coding guidelines enforcement</div>
+                            <div class="activity-item">Code reviews with security focus</div>
+                            <div class="activity-item">Static Application Security Testing (SAST)</div>
+                            <div class="activity-item">IDE security plugins integration</div>
+                            <div class="activity-item">Dependency vulnerability scanning</div>
+                        </div>
+                        <div class="code-block">
+                            <div class="code-title"># Secure Coding Example (Python)</div>
+                            <pre>
+import hashlib
+import secrets
+from cryptography.fernet import Fernet
+import re
+
+class SecureUserAuth:
+    """Secure user authentication implementation"""
+    
+    def __init__(self):
+        self.password_pattern = re.compile(
+            r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$'
+        )
+    
+    def hash_password(self, password: str, salt: bytes = None) -> tuple:
+        """Securely hash password with salt"""
+        if salt is None:
+            salt = secrets.token_bytes(32)
+        
+        # Use PBKDF2 with SHA256
+        hashed = hashlib.pbkdf2_hmac(
+            'sha256',
+            password.encode('utf-8'),
+            salt,
+            100000  # iterations
+        )
+        return (salt + hashed).hex()
+    
+    def validate_password(self, password: str) -> bool:
+        """Validate password meets security requirements"""
+        if not self.password_pattern.match(password):
+            raise ValueError(
+                "Password must be 12+ chars with uppercase, "
+                "lowercase, number, and special character"
+            )
+        return True
+    
+    def generate_secure_token(self) -> str:
+        """Generate cryptographically secure token"""
+        return secrets.token_urlsafe(32)
+                            </pre>
+                        </div>
+                    </div>
+
+                    <div class="phase-card">
+                        <div class="phase-number">4</div>
+                        <div class="phase-title">🧪 Phase 4: Security Testing</div>
+                        <div class="phase-description">
+                            Comprehensive security testing to identify vulnerabilities before deployment.
+                        </div>
+                        <div class="security-activities">
+                            <h4>Security Activities:</h4>
+                            <div class="activity-item">Dynamic Application Security Testing (DAST)</div>
+                            <div class="activity-item">Interactive Application Security Testing (IAST)</div>
+                            <div class="activity-item">Penetration testing</div>
+                            <div class="activity-item">Security regression testing</div>
+                            <div class="activity-item">Vulnerability assessment</div>
+                        </div>
+                    </div>
+
+                    <div class="phase-card">
+                        <div class="phase-number">5</div>
+                        <div class="phase-title">🚀 Phase 5: Secure Deployment</div>
+                        <div class="phase-description">
+                            Deploy applications securely with proper configurations and controls.
+                        </div>
+                        <div class="security-activities">
+                            <h4>Security Activities:</h4>
+                            <div class="activity-item">Security configuration review</div>
+                            <div class="activity-item">Infrastructure hardening</div>
+                            <div class="activity-item">Secrets management setup</div>
+                            <div class="activity-item">Network security controls</div>
+                            <div class="activity-item">Security monitoring activation</div>
+                        </div>
+                    </div>
+
+                    <div class="phase-card">
+                        <div class="phase-number">6</div>
+                        <div class="phase-title">🔧 Phase 6: Operations & Maintenance</div>
+                        <div class="phase-description">
+                            Ongoing security monitoring, patching, and incident response.
+                        </div>
+                        <div class="security-activities">
+                            <h4>Security Activities:</h4>
+                            <div class="activity-item">Security patch management</div>
+                            <div class="activity-item">Continuous vulnerability monitoring</div>
+                            <div class="activity-item">Security incident response</div>
+                            <div class="activity-item">Security metrics and reporting</div>
+                            <div class="activity-item">Regular security assessments</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BEST PRACTICES SECTION -->
+        <div id="practices" class="content-section">
+            <div class="card">
+                <h2>⭐ Industry Best Practices</h2>
+                
+                <h3>Microsoft SDL (Security Development Lifecycle)</h3>
+                <div class="best-practice">
+                    <div class="best-practice-title">Microsoft's Approach</div>
+                    <p>Microsoft SDL is one of the most mature secure development methodologies, used for all Microsoft products:</p>
+                    <ul style="margin-top: 10px;">
+                        <li>• <strong>Training:</strong> Mandatory security training for all developers</li>
+                        <li>• <strong>Requirements:</strong> Security requirements defined upfront</li>
+                        <li>• <strong>Design:</strong> Threat modeling for all features</li>
+                        <li>• <strong>Implementation:</strong> Banned function lists, static analysis</li>
+                        <li>• <strong>Verification:</strong> Dynamic analysis, fuzz testing</li>
+                        <li>• <strong>Release:</strong> Final security review, incident response plan</li>
+                        <li>• <strong>Response:</strong> Security servicing and response execution</li>
+                    </ul>
+                </div>
+
+                <h3>OWASP SAMM (Software Assurance Maturity Model)</h3>
+                <div class="maturity-levels">
+                    <div class="maturity-level">
+                        <div class="level-number">1</div>
+                        <div class="level-name">Initial</div>
+                        <div class="level-desc">Ad-hoc security practices</div>
+                    </div>
+                    <div class="maturity-level">
+                        <div class="level-number">2</div>
+                        <div class="level-name">Defined</div>
+                        <div class="level-desc">Basic security processes</div>
+                    </div>
+                    <div class="maturity-level">
+                        <div class="level-number">3</div>
+                        <div class="level-name">Implemented</div>
+                        <div class="level-desc">Consistent security practices</div>
+                    </div>
+                    <div class="maturity-level">
+                        <div class="level-number">4</div>
+                        <div class="level-name">Measured</div>
+                        <div class="level-desc">Metrics-driven security</div>
+                    </div>
+                    <div class="maturity-level">
+                        <div class="level-number">5</div>
+                        <div class="level-name">Optimized</div>
+                        <div class="level-desc">Continuous improvement</div>
+                    </div>
+                </div>
+
+                <h3>Google's Security Best Practices</h3>
+                <div class="best-practice">
+                    <div class="best-practice-title">Google's BeyondProd Security</div>
+                    <ul>
+                        <li>• <strong>Zero Trust:</strong> No implicit trust based on network location</li>
+                        <li>• <strong>Service Identity:</strong> Every service has cryptographic identity</li>
+                        <li>• <strong>Mutual TLS:</strong> All service communications encrypted</li>
+                        <li>• <strong>Binary Authorization:</strong> Only approved code runs in production</li>
+                        <li>• <strong>Automated Vulnerability Management:</strong> Continuous scanning and patching</li>
+                        <li>• <strong>Policy as Code:</strong> Security policies enforced programmatically</li>
+                    </ul>
+                </div>
+
+                <h3>Amazon's Security Development Practices</h3>
+                <div class="best-practice">
+                    <div class="best-practice-title">AWS Security by Design</div>
+                    <ul>
+                        <li>• <strong>Security Reviews:</strong> Mandatory for all new services</li>
+                        <li>• <strong>Threat Modeling:</strong> Using internal tools and methodologies</li>
+                        <li>• <strong>Automated Security Testing:</strong> Integrated in CI/CD pipelines</li>
+                        <li>• <strong>Game Days:</strong> Regular security incident simulations</li>
+                        <li>• <strong>Security Champions:</strong> Embedded security experts in teams</li>
+                        <li>• <strong>Shared Responsibility Model:</strong> Clear security boundaries</li>
+                    </ul>
+                </div>
+
+                <h3>Netflix's Security Approach</h3>
+                <div class="best-practice">
+                    <div class="best-practice-title">Netflix's Chaos Engineering for Security</div>
+                    <ul>
+                        <li>• <strong>Security Monkey:</strong> Automated security monitoring</li>
+                        <li>• <strong>Chaos Engineering:</strong> Intentional failure injection</li>
+                        <li>• <strong>Immutable Infrastructure:</strong> No runtime modifications</li>
+                        <li>• <strong>Automated Remediation:</strong> Self-healing security controls</li>
+                        <li>• <strong>Zero Trust Networking:</strong> BeyondCorp implementation</li>
+                        <li>• <strong>Continuous Compliance:</strong> Real-time compliance monitoring</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- TOOLS SECTION -->
+        <div id="tools" class="content-section">
+            <div class="card">
+                <h2>🛠️ Tools & Technologies</h2>
+                
+                <h3>Security Tools by SDLC Phase</h3>
+                
+                <h4>Planning & Requirements Phase</h4>
+                <div class="tool-grid">
+                    <div class="tool-card">
+                        <div class="tool-name">JIRA + Security Plugin</div>
+                        <div class="tool-category">Requirements Management</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-name">Microsoft Threat Modeling Tool</div>
+                        <div class="tool-category">Threat Modeling</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-name">OWASP Threat Dragon</div>
+                        <div class="tool-category">Threat Modeling</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-name">IriusRisk</div>
+                        <div class="tool-category">Risk Management</div>
+                    </div>
+                </div>
+
+                <h4>Design & Development Phase</h4>
+                <div class="tool-grid">
+                    <div class="tool-card">
+                        <div class="tool-name">SonarQube</div>
+                        <div class="tool-category">Code Quality & SAST</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-name">Checkmarx</div>
+                        <div class="tool-category">SAST</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-name">GitLab Security</div>
+                        <div class="tool-category">DevSecOps Platform</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-name">Snyk</div>
+                        <div class="tool-category">Dependency Scanning</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-name">Fortify</div>
+                        <div class="tool-category">Enterprise SAST</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-name">Veracode</div>
+                        <div class="tool-category">Application Security</div>
+                    </div>
+                </div>
+
+                <h4>Testing Phase</h4>
+                <div class="tool-grid">
+                    <div class="tool-card">
+                        <div class="tool-name">OWASP ZAP</div>
+                        <div class="tool-category">DAST</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-name">Burp Suite</div>
+                        <div class="tool-category">Web App Testing</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-name">Metasploit</div>
+                        <div class="tool-category">Penetration Testing</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-name">Nessus</div>
+                        <div class="tool-category">Vulnerability Scanner</div>
+                    </div>
+                </div>
+
+                <h4>Deployment & Operations Phase</h4>
+                <div class="tool-grid">
+                    <div class="tool-card">
+                        <div class="tool-name">HashiCorp Vault</div>
+                        <div class="tool-category">Secrets Management</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-name">Terraform</div>
+                        <div class="tool-category">IaC Security</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-name">Kubernetes Security</div>
+                        <div class="tool-category">Container Security</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-name">Splunk</div>
+                        <div class="tool-category">SIEM</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CLOUD ARCHITECTURE SECTION -->
+        <div id="cloud" class="content-section">
+            <div class="card">
+                <h2>☁️ Cloud Security Architecture Considerations</h2>
+                
+                <div class="cloud-architecture">
+                    <h3>Multi-Cloud Secure SDLC Architecture</h3>
+                    
+                    <div class="architecture-layer">
+                        <div class="layer-title">Developer Environment</div>
+                        <div class="layer-components">
+                            <span class="component-tag">Secure IDE</span>
+                            <span class="component-tag">Local Security Scanning</span>
+                            <span class="component-tag">Pre-commit Hooks</span>
+                            <span class="component-tag">Security Training Platform</span>
+                        </div>
+                    </div>
+
+                    <div class="architecture-layer">
+                        <div class="layer-title">CI/CD Pipeline Security</div>
+                        <div class="layer-components">
+                            <span class="component-tag">GitLab/GitHub Actions</span>
+                            <span class="component-tag">SAST Integration</span>
+                            <span class="component-tag">Container Scanning</span>
+                            <span class="component-tag">Secrets Management</span>
+                            <span class="component-tag">Policy as Code</span>
+                        </div>
+                    </div>
+
+                    <div class="architecture-layer">
+                        <div class="layer-title">Cloud Platform Security</div>
+                        <div class="layer-components">
+                            <span class="component-tag">AWS Security Hub</span>
+                            <span class="component-tag">Azure Security Center</span>
+                            <span class="component-tag">GCP Security Command Center</span>
+                            <span class="component-tag">CSPM Tools</span>
+                        </div>
+                    </div>
+
+                    <div class="architecture-layer">
+                        <div class="layer-title">Runtime Security</div>
+                        <div class="layer-components">
+                            <span class="component-tag">RASP</span>
+                            <span class="component-tag">WAF</span>
+                            <span class="component-tag">Container Runtime Security</span>
+                            <span class="component-tag">Serverless Security</span>
+                        </div>
+                    </div>
+
+                    <div class="architecture-layer">
+                        <div class="layer-title">Monitoring & Response</div>
+                        <div class="layer-components">
+                            <span class="component-tag">SIEM/SOAR</span>
+                            <span class="component-tag">Threat Intelligence</span>
+                            <span class="component-tag">Incident Response</span>
+                            <span class="component-tag">Forensics Tools</span>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Cloud-Native Security Controls</h3>
+                <div class="code-block">
+                    <div class="code-title"># Cloud Security Architecture Template (Terraform)</div>
+                    <pre>
+# AWS Security Controls for Secure SDLC
+module "security_baseline" {
+  source = "./modules/security"
+  
+  # Enable Security Services
+  enable_guardduty        = true
+  enable_security_hub     = true
+  enable_cloudtrail       = true
+  enable_config           = true
+  enable_access_analyzer  = true
+  
+  # Network Security
+  vpc_flow_logs_enabled   = true
+  waf_enabled            = true
+  shield_advanced        = true
+  
+  # Data Protection
+  kms_key_rotation       = true
+  s3_encryption         = "AES256"
+  ebs_encryption        = true
+  
+  # Identity & Access
+  mfa_required          = true
+  password_policy = {
+    minimum_length     = 14
+    require_symbols    = true
+    require_numbers    = true
+    require_uppercase  = true
+    require_lowercase  = true
+    max_age_days      = 90
+  }
+  
+  # Compliance
+  compliance_standards = ["PCI-DSS", "HIPAA", "SOC2"]
+}
+
+# Container Security Configuration
+resource "kubernetes_pod_security_policy" "restricted" {
+  metadata {
+    name = "restricted"
+  }
+  
+  spec {
+    privileged                 = false
+    allow_privilege_escalation = false
+    
+    required_drop_capabilities = ["ALL"]
+    
+    volumes = [
+      "configMap",
+      "emptyDir",
+      "projected",
+      "secret",
+      "downwardAPI",
+      "persistentVolumeClaim"
+    ]
+    
+    run_as_user {
+      rule = "MustRunAsNonRoot"
+    }
+    
+    se_linux {
+      rule = "RunAsAny"
+    }
+    
+    fs_group {
+      rule = "RunAsAny"
+    }
+    
+    read_only_root_filesystem = true
+  }
+}
+                    </pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q&A SECTION -->
+        <div id="qa" class="content-section">
+            <div class="card">
+                <h2>❓ Frequently Asked Questions</h2>
+                
+                <div class="qa-section">
+                    <div class="qa-item">
+                        <div class="qa-question" onclick="toggleQA(this)">
+                            <span>Q1: What's the difference between Secure SDLC and DevSecOps?</span>
+                            <span class="qa-toggle">+</span>
+                        </div>
+                        <div class="qa-answer">
+                            <p><strong>Secure SDLC</strong> is a broader framework that encompasses the entire software development lifecycle with security integrated at each phase. It's methodology-agnostic and can be applied to waterfall, agile, or any development approach.</p>
+                            
+                            <p style="margin-top: 15px;"><strong>DevSecOps</strong> is specifically the practice of integrating security into DevOps culture and practices. It emphasizes automation, continuous integration/deployment, and "shifting left" security.</p>
+                            
+                            <p style="margin-top: 15px;"><strong>Key Differences:</strong></p>
+                            <ul>
+                                <li>• Secure SDLC is a process framework; DevSecOps is a cultural practice</li>
+                                <li>• Secure SDLC can exist without DevOps; DevSecOps requires DevOps</li>
+                                <li>• Secure SDLC focuses on phases; DevSecOps focuses on automation</li>
+                                <li>• Both share the goal of building security into development</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="qa-item">
+                        <div class="qa-question" onclick="toggleQA(this)">
+                            <span>Q2: How do I implement Secure SDLC in an existing project?</span>
+                            <span class="qa-toggle">+</span>
+                        </div>
+                        <div class="qa-answer">
+                            <p><strong>Step-by-step approach for existing projects:</strong></p>
+                            
+                            <ol style="margin-top: 15px;">
+                                <li><strong>1. Assessment Phase (Week 1-2)</strong>
+                                    <ul>
+                                        <li>• Evaluate current security posture</li>
+                                        <li>• Identify gaps in current process</li>
+                                        <li>• Prioritize high-risk areas</li>
+                                    </ul>
+                                </li>
+                                
+                                <li style="margin-top: 10px;"><strong>2. Quick Wins (Week 3-4)</strong>
+                                    <ul>
+                                        <li>• Implement automated dependency scanning</li>
+                                        <li>• Add security linters to IDE</li>
+                                        <li>• Set up basic SAST scanning</li>
+                                    </ul>
+                                </li>
+                                
+                                <li style="margin-top: 10px;"><strong>3. Gradual Integration (Month 2-3)</strong>
+                                    <ul>
+                                        <li>• Add security gates in CI/CD</li>
+                                        <li>• Implement code review checklists</li>
+                                        <li>• Start threat modeling for new features</li>
+                                    </ul>
+                                </li>
+                                
+                                <li style="margin-top: 10px;"><strong>4. Full Implementation (Month 4-6)</strong>
+                                    <ul>
+                                        <li>• Complete security testing integration</li>
+                                        <li>• Establish security metrics</li>
+                                        <li>• Regular security training</li>
+                                    </ul>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="qa-item">
+                        <div class="qa-question" onclick="toggleQA(this)">
+                            <span>Q3: What are the key metrics to measure Secure SDLC effectiveness?</span>
+                            <span class="qa-toggle">+</span>
+                        </div>
+                        <div class="qa-answer">
+                            <p><strong>Essential Security Metrics:</strong></p>
+                            
+                            <table style="margin-top: 15px;">
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Target</th>
+                                    <th>Why It Matters</th>
+                                </tr>
+                                <tr>
+                                    <td>Vulnerability Density</td>
+                                    <td>&lt; 5 per KLOC</td>
+                                    <td>Code quality indicator</td>
+                                </tr>
+                                <tr>
+                                    <td>Mean Time to Remediate (MTTR)</td>
+                                    <td>&lt; 30 days</td>
+                                    <td>Response efficiency</td>
+                                </tr>
+                                <tr>
+                                    <td>Security Defect Escape Rate</td>
+                                    <td>&lt; 5%</td>
+                                    <td>Testing effectiveness</td>
+                                </tr>
+                                <tr>
+                                    <td>% Code Covered by SAST</td>
+                                    <td>&gt; 90%</td>
+                                    <td>Scanning coverage</td>
+                                </tr>
+                                <tr>
+                                    <td>Security Training Completion</td>
+                                    <td>100%</td>
+                                    <td>Team preparedness</td>
+                                </tr>
+                                <tr>
+                                    <td>False Positive Rate</td>
+                                    <td>&lt; 20%</td>
+                                    <td>Tool efficiency</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="qa-item">
+                        <div class="qa-question" onclick="toggleQA(this)">
+                            <span>Q4: How does Secure SDLC work in Agile/Scrum environments?</span>
+                            <span class="qa-toggle">+</span>
+                        </div>
+                        <div class="qa-answer">
+                            <p><strong>Secure SDLC in Agile:</strong></p>
+                            
+                            <ul style="margin-top: 15px;">
+                                <li><strong>Sprint Planning:</strong>
+                                    <ul>
+                                        <li>• Include security user stories</li>
+                                        <li>• Allocate 15-20% capacity for security tasks</li>
+                                        <li>• Security acceptance criteria for all stories</li>
+                                    </ul>
+                                </li>
+                                
+                                <li style="margin-top: 10px;"><strong>Daily Standups:</strong>
+                                    <ul>
+                                        <li>• Security champion participation</li>
+                                        <li>• Discuss security blockers</li>
+                                    </ul>
+                                </li>
+                                
+                                <li style="margin-top: 10px;"><strong>Sprint Execution:</strong>
+                                    <ul>
+                                        <li>• Continuous security testing</li>
+                                        <li>• Pair programming for security-critical code</li>
+                                        <li>• Incremental threat modeling</li>
+                                    </ul>
+                                </li>
+                                
+                                <li style="margin-top: 10px;"><strong>Sprint Review:</strong>
+                                    <ul>
+                                        <li>• Security demonstration</li>
+                                        <li>• Vulnerability metrics review</li>
+                                    </ul>
+                                </li>
+                                
+                                <li style="margin-top: 10px;"><strong>Retrospective:</strong>
+                                    <ul>
+                                        <li>• Security process improvements</li>
+                                        <li>• Lessons learned from security incidents</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="qa-item">
+                        <div class="qa-question" onclick="toggleQA(this)">
+                            <span>Q5: What's the cost-benefit analysis of implementing Secure SDLC?</span>
+                            <span class="qa-toggle">+</span>
+                        </div>
+                        <div class="qa-answer">
+                            <p><strong>Cost-Benefit Analysis:</strong></p>
+                            
+                            <div style="margin-top: 15px;">
+                                <h4>Costs:</h4>
+                                <ul>
+                                    <li>• Tool licenses: $50-200K/year</li>
+                                    <li>• Training: $20-50K initial</li>
+                                    <li>• Process changes: 10-15% productivity impact (first 6 months)</li>
+                                    <li>• Security personnel: 1-2 FTEs</li>
+                                </ul>
+                                
+                                <h4 style="margin-top: 15px;">Benefits:</h4>
+                                <ul>
+                                    <li>• 60% reduction in post-release vulnerabilities</li>
+                                    <li>• 50% faster security issue resolution</li>
+                                    <li>• 30% reduction in security incidents</li>
+                                    <li>• Avoided breach costs: Average $4.45M per breach (IBM)</li>
+                                    <li>• Compliance achievement: Avoid fines (up to 4% revenue for GDPR)</li>
+                                </ul>
+                                
+                                <p style="margin-top: 15px;"><strong>ROI:</strong> Typically positive within 12-18 months, with 3-year ROI of 300-500%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RECOMMENDATIONS SECTION -->
+        <div id="recommendations" class="content-section">
+            <div class="card">
+                <h2>🎓 Cloud Security Architect Recommendations</h2>
+                
+                <div class="recommendation-card">
+                    <div class="recommendation-title">📋 Essential Knowledge Areas</div>
+                    <ul class="recommendation-list">
+                        <li class="recommendation-item">Master cloud-native security services (AWS Security Hub, Azure Security Center, GCP Security Command Center)</li>
+                        <li class="recommendation-item">Understand container and Kubernetes security (admission controllers, network policies, PSPs)</li>
+                        <li class="recommendation-item">Learn Infrastructure as Code security (Terraform, CloudFormation security scanning)</li>
+                        <li class="recommendation-item">Know compliance frameworks (PCI-DSS, HIPAA, GDPR, SOC2) and their technical requirements</li>
+                        <li class="recommendation-item">Understand Zero Trust architecture principles and implementation</li>
+                        <li class="recommendation-item">Master secrets management and encryption key lifecycle</li>
+                        <li class="recommendation-item">Learn API security patterns and API gateway configurations</li>
+                        <li class="recommendation-item">Understand serverless security considerations and best practices</li>
+                    </ul>
+                </div>
+
+                <div class="recommendation-card">
+                    <div class="recommendation-title">🛠️ Technical Skills to Develop</div>
+                    <ul class="recommendation-list">
+                        <li class="recommendation-item">Scripting for security automation (Python, Bash, PowerShell)</li>
+                        <li class="recommendation-item">CI/CD pipeline security integration (Jenkins, GitLab CI, GitHub Actions)</li>
+                        <li class="recommendation-item">Container security tools (Trivy, Twistlock, Aqua Security)</li>
+                        <li class="recommendation-item">SAST/DAST tools configuration and tuning</li>
+                        <li class="recommendation-item">Cloud security posture management (CSPM) tools</li>
+                        <li class="recommendation-item">Security orchestration and automated response (SOAR)</li>
+                        <li class="recommendation-item">Threat modeling methodologies (STRIDE, PASTA, Attack Trees)</li>
+                        <li class="recommendation-item">Security monitoring and incident response in cloud</li>
+                    </ul>
+                </div>
+
+                <div class="recommendation-card">
+                    <div class="recommendation-title">🎯 Implementation Strategy</div>
+                    <ul class="recommendation-list">
+                        <li class="recommendation-item">Start with automated security scanning in CI/CD pipelines</li>
+                        <li class="recommendation-item">Implement policy as code for consistent security controls</li>
+                        <li class="recommendation-item">Create security blueprints and reference architectures</li>
+                        <li class="recommendation-item">Establish security metrics and KPIs dashboard</li>
+                        <li class="recommendation-item">Build security champions program across development teams</li>
+                        <li class="recommendation-item">Implement shift-left security with early testing</li>
+                        <li class="recommendation-item">Create automated compliance validation</li>
+                        <li class="recommendation-item">Develop incident response playbooks for cloud</li>
+                    </ul>
+                </div>
+
+                <h3>Security Architecture Checklist</h3>
+                <div class="checklist">
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <span>Identity and Access Management (IAM) properly configured</span>
+                    </div>
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <span>Network segmentation and security groups implemented</span>
+                    </div>
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <span>Data encryption at rest and in transit enabled</span>
+                    </div>
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <span>Secrets management solution deployed</span>
+                    </div>
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <span>Security monitoring and alerting configured</span>
+                    </div>
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <span>Vulnerability management process established</span>
+                    </div>
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <span>Incident response plan tested and documented</span>
+                    </div>
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <span>Compliance requirements mapped and validated</span>
+                    </div>
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <span>Security training program for developers active</span>
+                    </div>
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <span>Automated security testing in CI/CD pipeline</span>
+                    </div>
+                </div>
+
+                <div class="warning-box">
+                    <div class="warning-title">⚠️ Common Pitfalls to Avoid</div>
+                    <ul style="margin-top: 10px;">
+                        <li>• Don't treat security as a gate at the end - integrate throughout</li>
+                        <li>• Avoid tool sprawl - choose integrated platforms where possible</li>
+                        <li>• Don't ignore developer experience - security shouldn't block productivity</li>
+                        <li>• Avoid security theater - focus on real risk reduction</li>
+                        <li>• Don't skip security training - invest in your team's knowledge</li>
+                        <li>• Avoid one-size-fits-all - tailor security to risk levels</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Update navigation
+            const tabs = document.querySelectorAll('.nav-tab');
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        function toggleQA(element) {
+            const answer = element.nextElementSibling;
+            const toggle = element.querySelector('.qa-toggle');
+            
+            if (answer.classList.contains('active')) {
+                answer.classList.remove('active');
+                toggle.textContent = '+';
+            } else {
+                // Close other answers
+                document.querySelectorAll('.qa-answer').forEach(a => {
+                    a.classList.remove('active');
+                });
+                document.querySelectorAll('.qa-toggle').forEach(t => {
+                    t.textContent = '+';
+                });
+                
+                answer.classList.add('active');
+                toggle.textContent = '−';
+            }
+        }
+
+        function toggleCheck(element) {
+            const checkbox = element.querySelector('.checkbox');
+            checkbox.classList.toggle('checked');
+        }
+    </script>
+</body>
+</html>

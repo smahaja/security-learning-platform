@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LangChain Document Loaders - Learning Module</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #764ba2;
+            margin-bottom: 10px;
+        }
+        
+        .module-section {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        h3 {
+            color: #764ba2;
+            margin: 20px 0 15px 0;
+        }
+        
+        .concept-box {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        
+        .code-example {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .use-case {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .interactive-demo {
+            background: #fff3cd;
+            border: 2px dashed #ffc107;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        
+        button:hover {
+            background: #764ba2;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .tab-container {
+            margin: 20px 0;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .tab-button {
+            background: #e0e0e0;
+            color: #333;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px 5px 0 0;
+        }
+        
+        .tab-button.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 0 10px 10px 10px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 LangChain Document Loaders & Data Ingestion</h1>
+            <p>Master the art of ingesting and processing documents with LangChain</p>
+            <div class="progress-bar">
+                <div class="progress" id="progress">0%</div>
+            </div>
+        </header>
+
+        <!-- Module 1: Introduction -->
+        <div class="module-section">
+            <h2>Module 1: Understanding Document Loaders</h2>
+            
+            <div class="concept-box">
+                <h3>📚 What are Document Loaders?</h3>
+                <p>Document loaders in LangChain are specialized tools that help you read, parse, and prepare various types of documents for processing with Large Language Models (LLMs). They act as bridges between raw data sources and AI applications.</p>
+            </div>
+
+            <h3>Key Concepts:</h3>
+            <ul>
+                <li><strong>Data Ingestion:</strong> The process of importing data from various sources</li>
+                <li><strong>Document Processing:</strong> Converting raw data into structured format</li>
+                <li><strong>Metadata Extraction:</strong> Capturing additional information about documents</li>
+                <li><strong>Text Splitting:</strong> Breaking large documents into manageable chunks</li>
+            </ul>
+
+            <div class="use-case">
+                <h3>🏢 Real-World Example: Customer Support System</h3>
+                <p><strong>Scenario:</strong> A company wants to build an AI-powered customer support system that can answer questions based on their product documentation, FAQs, and support tickets.</p>
+                <p><strong>Challenge:</strong> Documents exist in various formats (PDF manuals, HTML FAQs, CSV ticket logs)</p>
+                <p><strong>Solution:</strong> Use LangChain document loaders to unify all data sources</p>
+            </div>
+        </div>
+
+        <!-- Module 2: Types of Document Loaders -->
+        <div class="module-section">
+            <h2>Module 2: Types of Document Loaders</h2>
+            
+            <div class="tab-container">
+                <div class="tab-buttons">
+                    <button class="tab-button active" onclick="showTab('pdf-tab')">PDF Loader</button>
+                    <button class="tab-button" onclick="showTab('web-tab')">Web Loader</button>
+                    <button class="tab-button" onclick="showTab('csv-tab')">CSV Loader</button>
+                    <button class="tab-button" onclick="showTab('json-tab')">JSON Loader</button>
+                </div>
+                
+                <div id="pdf-tab" class="tab-content active">
+                    <h3>PDF Document Loader</h3>
+                    <div class="code-example">
+from langchain.document_loaders import PyPDFLoader
+
+# Load a PDF document
+loader = PyPDFLoader("company_manual.pdf")
+documents = loader.load()
+
+# Each page becomes a separate document
+for doc in documents:
+    print(f"Page: {doc.metadata['page']}")
+    print(f"Content: {doc.page_content[:200]}...")
+                    </div>
+                    <p><strong>Use Case:</strong> Loading company policy manuals, research papers, or legal documents</p>
+                </div>
+                
+                <div id="web-tab" class="tab-content">
+                    <h3>Web Page Loader</h3>
+                    <div class="code-example">
+from langchain.document_loaders import WebBaseLoader
+
+# Load content from web pages
+loader = WebBaseLoader(["https://docs.company.com/faq"])
+docs = loader.load()
+
+# Process web content
+for doc in docs:
+    print(f"URL: {doc.metadata['source']}")
+    print(f"Title: {doc.metadata.get('title', 'N/A')}")
+                    </div>
+                    <p><strong>Use Case:</strong> Scraping documentation websites, blog posts, or online knowledge bases</p>
+                </div>
+                
+                <div id="csv-tab" class="tab-content">
+                    <h3>CSV Loader</h3>
+                    <div class="code-example">
+from langchain.document_loaders import CSVLoader
+
+# Load structured data from CSV
+loader = CSVLoader(
+    file_path="support_tickets.csv",
+    source_column="ticket_id"
+)
+documents = loader.load()
+
+# Each row becomes a document
+for doc in documents:
+    print(f"Ticket: {doc.metadata['source']}")
+    print(f"Content: {doc.page_content}")
+                    </div>
+                    <p><strong>Use Case:</strong> Processing support tickets, customer feedback, or product catalogs</p>
+                </div>
+                
+                <div id="json-tab" class="tab-content">
+                    <h3>JSON Loader</h3>
+                    <div class="code-example">
+from langchain.document_loaders import JSONLoader
+
+# Load JSON data with jq schema
+loader = JSONLoader(
+    file_path='products.json',
+    jq_schema='.products[]',
+    text_content=False
+)
+documents = loader.load()
+
+# Process structured JSON data
+for doc in documents:
+    print(f"Product: {doc.page_content}")
+                    </div>
+                    <p><strong>Use Case:</strong> API responses, configuration files, or structured product data</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Module 3: Complete Pipeline Example -->
+        <div class="module-section">
+            <h2>Module 3: Building a Complete Data Ingestion Pipeline</h2>
+            
+            <div class="use-case">
+                <h3>🏥 Real-World Use Case: Healthcare Knowledge Base</h3>
+                <p>Let's build a complete pipeline for a healthcare organization that needs to process medical guidelines, patient FAQs, and research papers.</p>
+            </div>
+
+            <div class="code-example">
+from langchain.document_loaders import PyPDFLoader, WebBaseLoader, CSVLoader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.embeddings import OpenAIEmbeddings
+from langchain.vectorstores import FAISS
+
+# Step 1: Load documents from multiple sources
+def load_all_documents():
+    documents = []
+    
+    # Load PDF medical guidelines
+    pdf_loader = PyPDFLoader("medical_guidelines.pdf")
+    documents.extend(pdf_loader.load())
+    
+    # Load web FAQs
+    web_loader = WebBaseLoader(["https://hospital.com/faq"])
+    documents.extend(web_loader.load())
+    
+    # Load patient feedback CSV
+    csv_loader = CSVLoader("patient_feedback.csv")
+    documents.extend(csv_loader.load())
+    
+    return documents
+
+# Step 2: Split documents into chunks
+def split_documents(documents):
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=1000,
+        chunk_overlap=200,
+        length_function=len
+    )
+    chunks = text_splitter.split_documents(documents)
+    return chunks
+
+# Step 3: Create embeddings and vector store
+def create_vector_store(chunks):
+    embeddings = OpenAIEmbeddings()
+    vectorstore = FAISS.from_documents(chunks, embeddings)
+    return vectorstore
+
+# Step 4: Complete pipeline
+def build_knowledge_base():
+    print("Loading documents...")
+    docs = load_all_documents()
+    
+    print(f"Loaded {len(docs)} documents")
+    
+    print("Splitting into chunks...")
+    chunks = split_documents(docs)
+    
+    print(f"Created {len(chunks)} chunks")
+    
+    print("Creating vector store...")
+    vectorstore = create_vector_store(chunks)
+    
+    print("Knowledge base ready!")
+    return vectorstore
+
+# Usage
+knowledge_base = build_knowledge_base()
+
+# Query the knowledge base
+query = "What are the symptoms of diabetes?"
+results = knowledge_base.similarity_search(query, k=3)
+
+for result in results:
+    print(f"Source: {result.metadata}")
+    print(f"Content: {result.page_content[:200]}...\n")
+            </div>
+        </div>
+
+        <!-- Module 4: Best Practices -->
+        <div class="module-section">
+            <h2>Module 4: Best Practices & Optimization</h2>
+            
+            <div class="concept-box">
+                <h3>✅ Best Practices</h3>
+                <ul>
+                    <li><strong>Chunking Strategy:</strong> Choose appropriate chunk sizes (500-1500 tokens typically work well)</li>
+                    <li><strong>Metadata Preservation:</strong> Always maintain source information for traceability</li>
+                    <li><strong>Error Handling:</strong> Implement robust error handling for different file formats</li>
+                    <li><strong>Incremental Loading:</strong> Process large datasets in batches to manage memory</li>
+                    <li><strong>Deduplication:</strong> Remove duplicate content to improve efficiency</li>
+                </ul>
+            </div>
+
+            <div class="interactive-demo">
+                <h3>🎮 Interactive Exercise</h3>
+                <p>Try implementing a document loader for your use case:</p>
+                <ol>
+                    <li>Choose your document type (PDF, CSV, Web, JSON)</li>
+                    <li>Set up the appropriate loader</li>
+                    <li>Configure text splitting parameters</li>
+                    <li>Test with sample data</li>
+                </ol>
+                <button onclick="updateProgress(25)">Complete Exercise 1</button>
+                <button onclick="updateProgress(50)">Complete Exercise 2</button>
+                <button onclick="updateProgress(75)">Complete Exercise 3</button>
+                <button onclick="updateProgress(100)">Complete All</button>
+            </div>
+        </div>
+
+        <!-- Module 5: Advanced Techniques -->
+        <div class="module-section">
+            <h2>Module 5: Advanced Techniques</h2>
+            
+            <h3>🔧 Custom Document Loaders</h3>
+            <div class="code-example">
+from langchain.document_loaders.base import BaseLoader
+from langchain.schema import Document
+
+class CustomDatabaseLoader(BaseLoader):
+    def __init__(self, connection_string, query):
+        self.connection_string = connection_string
+        self.query = query
+    
+    def load(self):
+        # Connect to database
+        # Execute query
+        # Transform results to documents
+        documents = []
+        for row in query_results:
+            doc = Document(
+                page_content=row['content'],
+                metadata={
+                    'id': row['id'],
+                    'timestamp': row['created_at'],
+                    'category': row['category']
+                }
+            )
+            documents.append(doc)
+        return documents
+            </div>
+
+            <h3>🚀 Performance Optimization</h3>
+            <div class="concept-box">
+                <p><strong>Parallel Processing:</strong> Use async loaders for multiple documents</p>
+                <p><strong>Caching:</strong> Implement caching for frequently accessed documents</p>
+                <p><strong>Streaming:</strong> Process large files in streams rather than loading entirely into memory</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabId) {
+            // Hide all tabs
+            const tabs = document.querySelectorAll('.tab-content');
+            const buttons = document.querySelectorAll('.tab-button');
+            
+            tabs.forEach(tab => tab.classList.remove('active'));
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected tab
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function updateProgress(percentage) {
+            const progressBar = document.getElementById('progress');
+            progressBar.style.width = percentage + '%';
+            progressBar.textContent = percentage + '%';
+        }
+
+        // Initialize progress
+        updateProgress(0);
+    </script>
+</body>
+</html>
