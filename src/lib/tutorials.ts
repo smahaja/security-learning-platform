@@ -95,6 +95,13 @@ export function saveTutorial(tutorial: Tutorial): void {
 
         const metadata = getMetadata();
 
+        // Check if tutorial with this ID already exists
+        const existingIndex = metadata.findIndex(t => t.id === tutorial.id);
+        if (existingIndex !== -1) {
+            console.error(`[saveTutorial] Tutorial with ID '${tutorial.id}' already exists`);
+            throw new Error(`A tutorial with ID '${tutorial.id}' already exists. Please use a different title or edit the existing tutorial.`);
+        }
+
         // Save HTML content to separate file
         const filePath = getTutorialFilePath(tutorial.id);
 

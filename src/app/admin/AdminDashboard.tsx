@@ -35,6 +35,8 @@ export default function AdminDashboard({ initialTutorials }: { initialTutorials:
     const [formData, setFormData] = useState({ title: '', description: '', content: '', category: 'LLM Security', tags: '' });
     const [editingId, setEditingId] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState<string | null>(null);
 
     const handleEdit = (tutorial: Tutorial) => {
         setEditingId(tutorial.id);
@@ -69,6 +71,8 @@ export default function AdminDashboard({ initialTutorials }: { initialTutorials:
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
+        setError(null);
+        setSuccess(null);
 
         try {
             const tagsArray = formData.tags.split(',').map(t => t.trim()).filter(Boolean);
@@ -87,18 +91,31 @@ export default function AdminDashboard({ initialTutorials }: { initialTutorials:
                 })
             });
 
+            const data = await res.json();
+
             if (res.ok) {
-                const { tutorial } = await res.json();
+                const { tutorial } = data;
                 if (editingId) {
                     setTutorials(prev => prev.map(t => t.id === editingId ? tutorial : t));
+                    setSuccess('Tutorial updated successfully!');
                 } else {
                     setTutorials(prev => [tutorial, ...prev]);
+                    setSuccess('Tutorial published successfully!');
                 }
                 handleCancelEdit(); // Reset form
                 router.refresh();
+
+                // Clear success message after 5 seconds
+                setTimeout(() => setSuccess(null), 5000);
+            } else {
+                // Handle error response
+                const errorMessage = data.error || 'Failed to save tutorial';
+                setError(errorMessage);
+                console.error('Failed to save:', errorMessage);
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Failed to save', error);
+            setError(error.message || 'An unexpected error occurred. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -115,6 +132,72 @@ export default function AdminDashboard({ initialTutorials }: { initialTutorials:
                     <span>&larr; Back to Platform</span>
                 </Link>
             </div>
+
+            {/* Success Message */}
+            {success && (
+                <div style={{
+                    padding: '1rem 1.5rem',
+                    marginBottom: '2rem',
+                    background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1))',
+                    border: '1px solid rgba(16, 185, 129, 0.3)',
+                    borderRadius: '12px',
+                    color: '#10b981',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.75rem',
+                    animation: 'slideDown 0.3s ease-out'
+                }}>
+                    <span style={{ fontSize: '1.25rem' }}>✅</span>
+                    <span style={{ fontWeight: 500 }}>{success}</span>
+                    <button
+                        onClick={() => setSuccess(null)}
+                        style={{
+                            marginLeft: 'auto',
+                            background: 'none',
+                            border: 'none',
+                            color: '#10b981',
+                            cursor: 'pointer',
+                            fontSize: '1.25rem',
+                            padding: '0 0.5rem'
+                        }}
+                    >
+                        ×
+                    </button>
+                </div>
+            )}
+
+            {/* Error Message */}
+            {error && (
+                <div style={{
+                    padding: '1rem 1.5rem',
+                    marginBottom: '2rem',
+                    background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1))',
+                    border: '1px solid rgba(239, 68, 68, 0.3)',
+                    borderRadius: '12px',
+                    color: '#ef4444',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.75rem',
+                    animation: 'slideDown 0.3s ease-out'
+                }}>
+                    <span style={{ fontSize: '1.25rem' }}>⚠️</span>
+                    <span style={{ fontWeight: 500 }}>{error}</span>
+                    <button
+                        onClick={() => setError(null)}
+                        style={{
+                            marginLeft: 'auto',
+                            background: 'none',
+                            border: 'none',
+                            color: '#ef4444',
+                            cursor: 'pointer',
+                            fontSize: '1.25rem',
+                            padding: '0 0.5rem'
+                        }}
+                    >
+                        ×
+                    </button>
+                </div>
+            )}
 
             <div className={styles.layout}>
                 {/* Create Form */}
